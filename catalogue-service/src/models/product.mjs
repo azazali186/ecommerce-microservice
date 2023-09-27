@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import Category from './category.mjs';
-import Stocks from './stocks.mjs';
 
 const { Schema } = mongoose;
 
@@ -22,6 +20,10 @@ const productSchema = new Schema({
     type: Schema.Types.String,
     ref: 'category'
   }],
+  meta: [{
+    type: Schema.Types.String,
+    ref: 'productMetaData'
+  }],
   createdAt: {
     type: Date,
     default: Date.now
@@ -36,6 +38,6 @@ productSchema.pre('save', function(next) {
   next();
 });
 
-const Product = mongoose.model('Product', productSchema);
+const Product = mongoose.model('product', productSchema);
 
 export default Product;

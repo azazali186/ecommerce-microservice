@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import Variations from './variations.mjs';
-import ProductPrices from './productPrice.mjs';
 
 const { Schema } = mongoose;
 
@@ -12,7 +10,7 @@ const stocksSchema = new Schema({
   },
   productId: {
     type: Schema.Types.String,
-    ref: 'Product'
+    ref: 'product'
   },
   name: {
     type: String,

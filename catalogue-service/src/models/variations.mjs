@@ -8,6 +8,10 @@ const variationSchema = new Schema({
     type: String,
     default: () => uuidv4().replace(/-/g, ""),
   },
+  stockId: {
+    type: Schema.Types.String,
+    ref: 'stocks'
+  },
   name: {
     type: String,
     required: true,

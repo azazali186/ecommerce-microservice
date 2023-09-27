@@ -3,30 +3,38 @@ import { v4 as uuidv4 } from "uuid";
 
 const { Schema } = mongoose;
 
-const ppSchema = new Schema({
+const productMetaDataSchema = new Schema({
   _id: {
     type: String,
     default: () => uuidv4().replace(/-/g, ""),
   },
-  stockId: {
+  productId: {
     type: Schema.Types.String,
-    ref: 'stocks'
+    ref: 'product'
   },
-  currencyCode: {
+  languageCode: {
     type: String,
     required: true,
   },
-  price: {
+  title: {
+    type: String,
+    required: true,
+  },
+  keyword: {
+    type: String,
+    required: true,
+  },
+  description: {
     type: String,
     required: true,
   },
 });
 
-ppSchema.pre("save", function (next) {
+productMetaDataSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-const ProductPrices = mongoose.model("productPrice", ppSchema);
+const ProductPrices = mongoose.model("productMetaData", productMetaDataSchema);
 
 export default ProductPrices;
