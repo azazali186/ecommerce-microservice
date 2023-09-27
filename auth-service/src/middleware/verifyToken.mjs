@@ -12,7 +12,7 @@ export const verifyToken = (req, res, next) => {
       next()
     })
   } else {
-    return res.status(401).json("Required token in header!")
+    return res.status(401).json({ message: "Required token in header!" })
   }
 }
 

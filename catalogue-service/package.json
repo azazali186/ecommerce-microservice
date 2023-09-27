@@ -1,7 +1,7 @@
 {
-  "name": "auth-service",
+  "name": "catalogue-service",
   "version": "1.0.0",
-  "description": "This is the auth service for ecommerce microserviceproject",
+  "description": "This is the catalogue service for ecommerce microserviceproject",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
@@ -11,18 +11,16 @@
   "author": "Ali Azaz M",
   "license": "MIT",
   "dependencies": {
-    "amqplib": "^0.10.3",
+    "amqplib": "latest",
     "cors": "latest",
     "crypto-js": "latest",
     "dotenv": "latest",
-    "eureka-js-client": "^4.5.0",
+    "eureka-js-client": "latest",
     "express": "latest",
     "express-list-routes": "latest",
     "jsonwebtoken": "latest",
+    "mongoose": "latest",
     "nodemon": "latest",
-    "pg": "latest",
-    "pg-hstore": "latest",
-    "sequelize": "latest",
     "uuid": "latest"
   }
 }
