@@ -1,0 +1,44 @@
+server:
+  port: 8101
+
+spring:
+  main:
+   allow-bean-definition-overriding: true
+#    web-application-type: reactive
+  datasource:
+    url: jdbc:postgresql://localhost:5556/sdk_auth_service
+    username: janny
+    password: Aj189628@
+    driver-class-name: org.postgresql.Driver
+
+  # cloud: 
+  #   discovery:
+  #     enabled: true
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type: TRACE
+  
+
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://localhost:5145/eureka/
+  
+
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0

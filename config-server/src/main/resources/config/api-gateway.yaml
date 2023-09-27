@@ -1,0 +1,16 @@
+server:
+  port: 5099
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:5145/eureka/  # Eureka server location
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"  # Expose all actuator endpoints, be cautious with this in production
+  tracing:
+    sampling:
+      probability: 1.0  # Setting tracing sampling to 100%

@@ -1,0 +1,58 @@
+version: '3.1'
+
+services:
+  master-db-service:
+    image: timescale/timescaledb:latest-pg15
+    environment:
+      POSTGRES_PASSWORD: Aj189628@
+      POSTGRES_USER: janny
+    ports:
+      - 5556:5432
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3100:5100"
+    environment:
+      DATABASE_URL: postgres://janny:Aj189628@@master-db-service:5556/auth-service
+      PORT: 5100
+      JWT_SECRET: Aj189628@
+      PASS_SECRET: Aj189628@
+    depends_on:
+      - master-db-service
+
+  master-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3110:5110"
+    environment:
+      DATABASE_URL: postgres://janny:Aj189628@@master-db-service:5556/master-service
+      PORT: 5110
+      JWT_SECRET: Aj189628@
+      PASS_SECRET: Aj189628@
+    depends_on:
+      - master-db-service
+
+  profile-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3120:5120"
+    environment:
+      DATABASE_URL: postgres://janny:Aj189628@@profile-db-service:5556/profile-service
+      PORT: 5120
+      JWT_SECRET: Aj189628@
+      PASS_SECRET: Aj189628@
+    depends_on:
+      - master-db-service
+
+
+volumes:
+  timescale_data:

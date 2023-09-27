@@ -1,0 +1,48 @@
+CREATE TABLE countries (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    code VARCHAR(255) NOT NULL UNIQUE,
+    dial VARCHAR(255) NOT NULL UNIQUE,
+    status BOOLEAN DEFAULT true,
+    createdAt TIMESTAMPTZ NOT NULL,
+    updatedAt TIMESTAMPTZ NOT NULL
+);
+
+CREATE TABLE currencies (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    code VARCHAR(255) NOT NULL UNIQUE,
+    status BOOLEAN DEFAULT true,
+    createdAt TIMESTAMPTZ NOT NULL,
+    updatedAt TIMESTAMPTZ NOT NULL
+);
+
+
+CREATE TABLE languages (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    code VARCHAR(255) NOT NULL UNIQUE,
+    status BOOLEAN DEFAULT true,
+    createdAt TIMESTAMPTZ NOT NULL,
+    updatedAt TIMESTAMPTZ NOT NULL
+);
+
+
+CREATE TABLE permissions (
+    id UUID PRIMARY KEY,
+    path VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    guard VARCHAR(255) DEFAULT 'web' NOT NULL,
+    createdAt TIMESTAMPTZ NOT NULL,
+    updatedAt TIMESTAMPTZ NOT NULL
+);
+
+CREATE TABLE states (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(255) NOT NULL UNIQUE,
+    countryId UUID NOT NULL REFERENCES countries(id),
+    status BOOLEAN DEFAULT true,
+    createdAt TIMESTAMPTZ NOT NULL,
+    updatedAt TIMESTAMPTZ NOT NULL
+);
