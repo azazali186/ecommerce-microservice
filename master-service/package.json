@@ -1,7 +1,7 @@
 {
   "name": "master-service",
   "version": "1.0.0",
-  "description": "This is the master service for ecommerce microserviceproject",
+  "description": "This is the master service for ecommerce microservice project",
   "main": "src/index.js",
   "type": "module",
   "scripts": {

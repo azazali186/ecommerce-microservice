@@ -1,7 +1,7 @@
 {
   "name": "catalogue-service",
   "version": "1.0.0",
-  "description": "This is the catalogue service for ecommerce microserviceproject",
+  "description": "This is the catalogue service for ecommerce microservice project",
   "main": "src/index.js",
   "type": "module",
   "scripts": {

@@ -1,56 +1,59 @@
-import mongoose from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
+import mongoose from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 
 const { Schema } = mongoose;
 
 const stocksSchema = new Schema({
   _id: {
     type: String,
-    default: () => uuidv4().replace(/-/g, '')
+    default: () => uuidv4().replace(/-/g, ""),
   },
   productId: {
     type: Schema.Types.String,
-    ref: 'product'
+    ref: "product",
   },
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  description: {
-    type: String,
-    trim: true
-  },
+  translation: [
+    {
+      type: Schema.Types.String,
+      ref: "translations",
+    },
+  ],
   sku: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
-  images: [{
-    type: String
-  }],
-  variations:[{
-    type: Schema.Types.String,
-    ref: 'variations'
-  }],
-  price: [{
-    type: Schema.Types.String,
-    ref: 'productPrice'
-  }],
+  images: [
+    {
+      type: String,
+    },
+  ],
+  variations: [
+    {
+      type: Schema.Types.String,
+      ref: "variations",
+    },
+  ],
+  price: [
+    {
+      type: Schema.Types.String,
+      ref: "productPrice",
+    },
+  ],
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   updatedAt: {
-    type: Date
-  }
+    type: Date,
+  },
 });
 
-stocksSchema.pre('save', function(next) {
+stocksSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-const Stock = mongoose.model('stocks', stocksSchema);
+const Stock = mongoose.model("stocks", stocksSchema);
 
 export default Stock;
