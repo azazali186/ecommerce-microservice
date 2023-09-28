@@ -16,6 +16,7 @@ import Product from './models/product.mjs';
 const app = express();
 
 import { inserData } from './utils/index.mjs';
+import Interaction from './models/interaction.mjs';
 
 
 app.use(express.json());
@@ -30,6 +31,11 @@ eurekaClient.start(error => {
 
 User.belongsToMany(Product, { through: UserInteraction });
 Product.belongsToMany(User, { through: UserInteraction });
+
+User.hasMany(Interaction);
+Product.hasMany(Interaction);
+Interaction.belongsTo(User);
+Interaction.belongsTo(Product);
 
 
 sequelize.sync();

@@ -2,30 +2,38 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/sequelize.mjs";
 import { v4 as uuidv4 } from "uuid";
 
-class Product extends Model {}
+class Interaction extends Model {}
 
-Product.init(
+Interaction.init(
   {
     id: {
       type: DataTypes.STRING,
       primaryKey: true,
       defaultValue: () => uuidv4().replace(/-/g, ""),
     },
+    rating: {
+      type: DataTypes.FLOAT,
+      required: false,
+      default : 0.0
+    },
+    userId: {
+      type: DataTypes.STRING,
+      required: true,
+    },
     productId: {
       type: DataTypes.STRING,
+      required: true,
     },
-    name: {
+    type: {
       type: DataTypes.STRING,
-    },
-    description: {
-      type: DataTypes.TEXT,
+      required: true,
     },
   },
   {
     sequelize,
-    modelName: "Product",
-    tableName: "products"
+    modelName: "Interaction",
+    tableName: "interactions",
   }
 );
 
-export default Product;
+export default Interaction;

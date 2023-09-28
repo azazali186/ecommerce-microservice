@@ -11,7 +11,7 @@ User.init(
       primaryKey: true,
       defaultValue: () => uuidv4().replace(/-/g, ""),
     },
-    username: {
+    userId: {
       type: DataTypes.STRING,
     }
   },
