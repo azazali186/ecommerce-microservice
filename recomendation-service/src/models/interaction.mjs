@@ -19,10 +19,13 @@ Interaction.init(
     userId: {
       type: DataTypes.STRING,
       required: true,
+      references: 'users',
+
     },
     productId: {
       type: DataTypes.STRING,
       required: true,
+      references: 'products',
     },
     type: {
       type: DataTypes.STRING,

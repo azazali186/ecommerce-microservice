@@ -3,6 +3,9 @@ import Product from "../models/product.mjs";
 
 const getProductData = async (productData) => {
   const productIds = productData.productIds;
+  if (!productIds || productIds.length === 0) {
+    return [];
+  }
   const products = await Product.find({ _id: { $in: productIds } })
     .populate("stocks") // Assuming a 'stocks' field references the Stock model
     .populate("category");
@@ -28,7 +31,7 @@ export const listenForCatalogRequest = async () => {
       msg.properties.replyTo,
       Buffer.from(
         JSON.stringify({
-          data: products
+          data: products,
         })
       ),
       {

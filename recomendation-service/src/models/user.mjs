@@ -13,6 +13,9 @@ User.init(
     },
     userId: {
       type: DataTypes.STRING,
+    },
+    username: {
+      type: DataTypes.STRING,
     }
   },
   {

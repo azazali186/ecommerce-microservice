@@ -10,6 +10,7 @@ import {
 import tf from "@tensorflow/tfjs-node";
 import Interaction from "../../models/interaction.mjs";
 import { getInteractionValue } from "../../utils/trainTensorFlowModel.mjs";
+import { requestProducts } from "../rabbitMq/requestProducts.mjs";
 
 // Create a new product in PostgreSQL and index it in Elasticsearch
 productsRoutes.post("/products", async (req, res) => {
@@ -100,11 +101,6 @@ productsRoutes.patch("/products/:id", async (req, res) => {
   res.json({ message: "Product updated successfully!" });
 });
 
-// Delete product from PostgreSQL and Elasticsearch
-productsRoutes.delete("/products/:id", async (req, res) => {
-  // Remove from PostgreSQL & Elasticsearch
-});
-
 productsRoutes.get("/recommendations/:userId", async (req, res) => {
   const userId = req.params.userId;
 
@@ -150,6 +146,12 @@ productsRoutes.get("/recommendations/:userId", async (req, res) => {
     recommendedProducts = await Product.findAll({
       where: { id: recommendedProductIds },
     });
+    const results = recommendedProducts.map((product) => product.productId);
+
+    recommendedProducts = requestProducts({
+      productIds: results,
+    });
+
   } catch (error) {
     console.error("Error fetching recommended products:", error);
     return res.status(500).json({ error: "Failed to fetch product details." });
