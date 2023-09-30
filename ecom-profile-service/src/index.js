@@ -52,7 +52,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.use("/api/catalogue-service/profiles", profilesRoutes);
+app.use("/api/profile-service/profiles", profilesRoutes);
 
 await inserData(expressListRoutes, app);
 
