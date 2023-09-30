@@ -1,3 +1,5 @@
+## JAVA 20
+## Node 20
 ### PORT Configuration for Service and DB Server List
 
 | Sr No | Service Name      | PORT  | Sr No | Service Name       | PORT  | Sr No | Service Name       | PORT  |
