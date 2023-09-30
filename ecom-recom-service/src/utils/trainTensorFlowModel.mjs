@@ -21,12 +21,12 @@ const saveEmbeddingsToMongo = async (embeddings, collectionName) => {
   await collection.insertOne(modelJSON);
 };
 
-export const getIntractionValue = (interaction) => {
-  return WEIGHTS[interaction] || 0;
+export const getIntractionValue = (intraction) => {
+  return WEIGHTS[intraction] || 0;
 };
 
 const createUserItemMatrix = async (userId) => {
-  const interactions = await Intraction.findAll();
+  const intractions = await Intraction.findAll();
   const users = await User.findOne({ where: { userId: userId } });
   const products = await Product.findAll();
 
@@ -35,12 +35,12 @@ const createUserItemMatrix = async (userId) => {
     .fill(null)
     .map(() => Array(products.length).fill(0));
 
-  interactions.forEach((interaction) => {
-    const userIndex = users.findIndex((u) => u.userId === interaction.userId);
+  intractions.forEach((intraction) => {
+    const userIndex = users.findIndex((u) => u.userId === intraction.userId);
     const productIndex = products.findIndex(
-      (p) => p.id === interaction.productId
+      (p) => p.id === intraction.productId
     );
-    const weight = getIntractionValue[interaction.type];
+    const weight = getIntractionValue[intraction.type];
 
     matrix[userIndex][productIndex] += weight;
   });
@@ -114,7 +114,7 @@ export const getRecommandedProducts = async (userId = null, topN = 10) => {
 export const trainTensorFlowModel = async () => {
   const users = await User.findAll();
   const products = await Product.findAll();
-  const interactions = await Intraction.findAll();
+  const intractions = await Intraction.findAll();
 
   const numUsers = users.length;
   const numProducts = products.length;
@@ -122,19 +122,19 @@ export const trainTensorFlowModel = async () => {
   const userIDs = users.map((user) => user.id);
   const productIDs = products.map((product) => product.id);
 
-  // Create a 2D tensor for user-product interactions, initialized with zeros
-  const interactionMatrix = tf.tensor2d(
+  // Create a 2D tensor for user-product intractions, initialized with zeros
+  const intractionMatrix = tf.tensor2d(
     new Array(numUsers).fill(null).map((row) => new Array(numProducts).fill(0)),
     [numUsers, numProducts]
   );
 
-  // Populate the interaction matrix based on the interactions in the database
-  interactions.forEach((interaction) => {
-    const userIndex = userIDs.indexOf(interaction.userId);
-    const productIndex = productIDs.indexOf(interaction.productId);
-    interactionMatrix
+  // Populate the intraction matrix based on the intractions in the database
+  intractions.forEach((intraction) => {
+    const userIndex = userIDs.indexOf(intraction.userId);
+    const productIndex = productIDs.indexOf(intraction.productId);
+    intractionMatrix
       .bufferSync()
-      .set(interaction.rating, userIndex, productIndex);
+      .set(intraction.rating, userIndex, productIndex);
   });
 
   // Matrix factorization
@@ -157,7 +157,7 @@ export const trainTensorFlowModel = async () => {
         false
       );
       const loss = tf.losses.meanSquaredError(
-        interactionMatrix,
+        intractionMatrix,
         predictedIntractions
       );
       return loss;
@@ -175,14 +175,14 @@ export const getPastProductsForUser = async (userId) => {
   }
 
   try {
-    // Fetch interactions for a specific user where the interaction type is 'purchased'
-    const interactions = await Intraction.findAll({
+    // Fetch intractions for a specific user where the intraction type is 'purchased'
+    const intractions = await Intraction.findAll({
       where: { userId: userId, type: "purchased" },
       include: Product, // Join with products to get product details
     });
 
-    // Extract product details from the interactions
-    const pastProducts = interactions.map((interaction) => interaction.Product);
+    // Extract product details from the intractions
+    const pastProducts = intractions.map((intraction) => intraction.Product);
 
     return pastProducts;
   } catch (error) {

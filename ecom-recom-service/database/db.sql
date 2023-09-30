@@ -25,7 +25,7 @@ CREATE TABLE permissions (
 );
 
 -- Intraction table creation
-CREATE TABLE interactions (
+CREATE TABLE intractions (
     id VARCHAR(255) PRIMARY KEY,
     rating FLOAT DEFAULT 0.0,
     userId VARCHAR(255) NOT NULL,

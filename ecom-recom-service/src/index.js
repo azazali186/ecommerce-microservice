@@ -16,7 +16,7 @@ import Product from './models/product.mjs';
 const app = express();
 
 import { inserData } from './utils/index.mjs';
-import Intraction from './models/interaction.mjs';
+import Intraction from './models/intraction.mjs';
 
 
 app.use(express.json());
