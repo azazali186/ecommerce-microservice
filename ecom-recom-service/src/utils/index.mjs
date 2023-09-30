@@ -2,6 +2,11 @@ import Permissions from "../models/permissions.mjs";
 import Role from "../models/roles.mjs";
 import { Op } from "sequelize";
 
+import { esClient } from "../config/esClient";
+import Product from "../models/product.mjs";
+import Interaction from "../models/interaction.mjs";
+import { getInteractionValue } from "./trainTensorFlowModel.mjs";
+
 export const getMethodName = (key) => {
   switch (key) {
     case "GET":
@@ -98,5 +103,67 @@ export const inserData = async (expressListRoutes, app) => {
   getPermissionsData(expressListRoutes, app);
   await getRoleData();
 };
+
+
+export const createEs = async (name, body) => {
+  try {
+    esClient.index({
+      index: name,
+      body: body,
+    });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ error: "Error indexing product in Elasticsearch" });
+  }
+}
+
+export const updateEs = async (id, name, body) => {
+  try {
+    esClient.update({
+      index: name,
+      id: id,
+      body: {
+        doc: body,
+      },
+    });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ error: "Error updating product in Elasticsearch." });
+  }
+}
+
+async function createInteraction(productId, userId, intraction) {
+  return await Interaction.create({
+    productId: productId,
+    userId: userId,
+    type: intraction,
+    rating: getInteractionValue(intraction),
+  }).save();
+}
+
+export const createProductData = async (productId, name, description, intraction, userId) => {
+
+  const product = await Product.create({
+    name: name,
+    productId: productId,
+    description: description,
+  }).save();
+
+  await createInteraction(product.id, userId, intraction);
+  await createEs("products", product)
+  // Train/update your TensorFlow model
+  try {
+    // Hypothetical function to update your recommendation model with new data
+    await trainTensorFlowModel();
+
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ error: "Error updating recommendation model" });
+  }
+  return product
+}
 
 export default { getMethodName, inserData, getRoleData };

@@ -17,7 +17,7 @@ const getProductData = async (productData) => {
 };
 
 export const listenForCatalogRequest = async () => {
-  const connection = await connect("amqp://localhost");
+  const connection = await connect(process.env.RABBIT_MQ_URL);
   const channel = await connection.createChannel();
 
   await channel.assertQueue("ecom_catalogue_service_queue");

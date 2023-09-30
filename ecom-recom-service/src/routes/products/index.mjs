@@ -8,47 +8,20 @@ import {
   trainTensorFlowModel,
 } from "../../utils/trainTensorFlowModel.mjs";
 import tf from "@tensorflow/tfjs-node";
-import Interaction from "../../models/interaction.mjs";
-import { getInteractionValue } from "../../utils/trainTensorFlowModel.mjs";
 import { requestProducts } from "../rabbitMq/requestProducts.mjs";
+import { createProductData, updateEs } from "../../utils/index.mjs";
 
 // Create a new product in PostgreSQL and index it in Elasticsearch
 productsRoutes.post("/products", async (req, res) => {
   const { productId, name, description, intraction, userId } = req.body;
   // Save product to PostgreSQL & Elasticsearch
-  const product = await Product.create({
-    name: name,
-    productId: productId,
-    description: description,
-  }).save();
-
-  await Interaction.create({
-    productId: product.id,
-    userId: userId,
-    type: intraction,
-    rating: getInteractionValue(intraction),
-  }).save();
-
-  // Add to Elasticsearch
-  try {
-    esClient.index({
-      index: "products",
-      body: product,
-    });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ error: "Error indexing product in Elasticsearch" });
-  }
-  // Train/update your TensorFlow model
-  try {
-    // Hypothetical function to update your recommendation model with new data
-    await trainTensorFlowModel();
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ error: "Error updating recommendation model" });
-  }
+  const product = createProductData(
+    productId,
+    name,
+    description,
+    intraction,
+    userId
+  );
   res.json(product);
 });
 
@@ -56,7 +29,7 @@ productsRoutes.post("/products", async (req, res) => {
 
 productsRoutes.patch("/products/:id", async (req, res) => {
   const pId = req.params.id;
-  const { productId, name, description, intraction, userId } = req.body;
+  const { productId, name, description } = req.body;
 
   // Update product in PostgreSQL
   let updatedProduct;
@@ -66,7 +39,6 @@ productsRoutes.patch("/products/:id", async (req, res) => {
       { where: { id: pId } }
     );
     updatedProduct = await Product.findByPk(pId);
-
   } catch (err) {
     return res
       .status(500)
@@ -75,19 +47,8 @@ productsRoutes.patch("/products/:id", async (req, res) => {
 
   // Update product in Elasticsearch
 
-  try {
-    esClient.update({
-      index: "products",
-      id: pId,
-      body: {
-        doc: updatedProduct,
-      },
-    });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ error: "Error updating product in Elasticsearch." });
-  }
+  await updateEs(pId, "products", updatedProduct);
+
 
   // Re-train/update your TensorFlow model (hypothetical function)
   try {
@@ -151,7 +112,6 @@ productsRoutes.get("/recommendations/:userId", async (req, res) => {
     recommendedProducts = requestProducts({
       productIds: results,
     });
-
   } catch (error) {
     console.error("Error fetching recommended products:", error);
     return res.status(500).json({ error: "Failed to fetch product details." });
@@ -161,12 +121,11 @@ productsRoutes.get("/recommendations/:userId", async (req, res) => {
 });
 
 productsRoutes.get("/recommended/:userId", async (req, res) => {
-    const userId = req.params.userId;
+  const userId = req.params.userId;
 
-    const recommendedProducts  = await getRecommandedProducts(userId, 15)
-  
-  
-    return res.json({ recommendations: recommendedProducts });
-  });
+  const recommendedProducts = await getRecommandedProducts(userId, 15);
+
+  return res.json({ recommendations: recommendedProducts });
+});
 
 export default productsRoutes;

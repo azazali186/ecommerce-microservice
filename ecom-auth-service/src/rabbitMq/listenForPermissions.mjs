@@ -46,7 +46,7 @@ const storePermissions = async (permissions, service) => {
 };
 
 export const listenForPermissions = async () => {
-  const connection = await amqp.connect("amqp://localhost");
+  const connection = await amqp.connect(process.env.RABBIT_MQ_URL);
   const channel = await connection.createChannel();
 
   const exchange = "ecommerce_permissions_exchange";
