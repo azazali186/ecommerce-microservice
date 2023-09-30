@@ -1,7 +1,7 @@
 import { createProductData } from "../utils/index.mjs";
 
 export const listnerForProductES = async () => {
-  const connection = await connect(process.env.RABBIT_MQ_URL);
+  const connection = await connect(process.env.RABBIT_MQ_URL || "amqp://localhost");
   const channel = await connection.createChannel();
 
   await channel.assertQueue("ecom_product_recom_service");

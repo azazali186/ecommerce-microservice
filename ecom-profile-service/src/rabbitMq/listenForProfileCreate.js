@@ -21,7 +21,7 @@ const getProfile = async (userData) => {
   };
 
 export const listenForAuthRequests = async () => {
-  const connection = await connect(process.env.RABBIT_MQ_URL);
+  const connection = await connect(process.env.RABBIT_MQ_URL || "amqp://localhost");
   const channel = await connection.createChannel();
 
   await channel.assertQueue("ecommerce_create_user_profile");

@@ -1,7 +1,7 @@
 import { connect } from "amqplib";
 
 export const sendProfileToProfileService = async (profileData) => {
-  const connection = await connect(process.env.RABBIT_MQ_URL);
+  const connection = await connect(process.env.RABBIT_MQ_URL || "amqp://localhost");
   const channel = await connection.createChannel();
 
   const queue = await channel.assertQueue("", { exclusive: true });
