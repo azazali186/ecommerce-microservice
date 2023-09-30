@@ -1,7 +1,7 @@
 ### PORT Configuration for Service and DB Server List
 
-| Sr No | Service Name      | port  | Sr No | Service Name       | port  | Sr No | Service Name       | port  |
-|------:|-------------------|-------|-------|--------------------|-------|----------------------------|-------|
+| Sr No | Service Name      | PORT  | Sr No | Service Name       | PORT  | Sr No | Service Name       | PORT  |
+|------:|-------------------|-------|-------|--------------------|-------|-------|--------------------|-------|
 | 1     | API Gateway       | 3099  | 2     | Config             | 3088  | 3     | Eureka             | 3145  |
 | 4     | Files             | 3055  | 5     | Elastic Search     | 3200  | 6     | Recom              | 3199  |
 | 7     | Postgress         | 5556  | 8     | MongoDB            | 27027 | 9     | Auth Service       | 3110  |
