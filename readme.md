@@ -1,6 +1,6 @@
 ### PORT Configuration for Service and DB Server
 
-| Sr No | Service Name      | PORT  | Sr No | Service Name       | PORT  | Sr No | Service Name       | PORT  |
+| Sr No | Service Name      | Port  | Sr No | Service Name       | Port  | Sr No | Service Name       | Port  |
 |------:|-------------------|-------|----------------------------|-------|----------------------------|-------|
 | 1     | API Gateway       | 3099  | 2     | Config             | 3088  | 3     | Eureka             | 3145  |
 | 4     | Files             | 3055  | 5     | Elastic Search     | 3200  | 6     | Recom              | 3199  |
