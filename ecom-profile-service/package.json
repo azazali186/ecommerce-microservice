@@ -20,7 +20,7 @@
     "express-list-routes": "latest",
     "jsonwebtoken": "latest",
     "mongoose": "latest",
-    "nodemon": "latest",
+    "nodemon": "^3.0.1",
     "uuid": "latest"
   }
 }

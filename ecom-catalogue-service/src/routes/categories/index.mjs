@@ -2,7 +2,7 @@ import {
     verifyTokenAndAuthorization
 } from "../../middleware/verifyToken.mjs";
 import Category from "../../models/category.mjs";
-
+import { paginate } from "../../utils/index.mjs";
 import express from 'express';
 const categoriesRoutes = express.Router()
 

@@ -10,6 +10,7 @@ CREATE TABLE permissions (
     path VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     guard VARCHAR(255) DEFAULT 'web',
+    service VARCHAR(255) DEFAULT 'auth-service',
     createdAt TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

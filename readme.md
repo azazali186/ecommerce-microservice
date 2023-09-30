@@ -14,7 +14,7 @@
 
 | Sr No | Database Name         | Sr No | Database Name          | Sr No | Database Name           |
 |------:|-----------------------|-------|------------------------|-------|-------------------------|
-| 1     | ecom-auth-service     | 2     | ecom-master-service    | 3     | ecom-catelogue-service  |
+| 1     | ecom-auth-service     | 2     | ecom-master-service    |       |                         |
 
 
 ### MongoDB Server DB List
@@ -22,4 +22,4 @@
 | Sr No | Database Name         | Sr No | Database Name          | Sr No | Database Name           |
 |------:|-----------------------|-------|------------------------|-------|-------------------------|
 | 1     | ecom-recom-train      | 2     | ecom-profile-service   | 3     | ecom-file-service       |
-
+| 4     | ecom-catelogue-service|       |                        |       |                         |

@@ -23,7 +23,7 @@ eurekaClient.start(error => {
 
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/catelogue-service';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/profile-service';
 
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
@@ -35,6 +35,7 @@ mongoose.connect(MONGODB_URI, {
 });
 
 import profilesRoutes from "./routes/profiles/index.mjs"
+import { rabbitMQListener } from './rabbitMq/index.mjs';
 
 var whitelist = ["http://localhost:8000", "http://localhost:8080"];
 const corsOptions = {
@@ -53,7 +54,12 @@ app.use(cors(corsOptions));
 
 app.use("/api/catalogue-service/profiles", profilesRoutes);
 
-inserData(expressListRoutes, app);
+await inserData(expressListRoutes, app);
+
+
+rabbitMQListener
+();
+
 
 app.listen(process.env.PORT || 3120, function () {
   console.log(

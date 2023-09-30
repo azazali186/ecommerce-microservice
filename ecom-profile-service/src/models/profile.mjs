@@ -14,7 +14,6 @@ const profileSchema = new Schema({
   },
   name: {
     type: String,
-    required: true
   },
   dob: {
     type: Date,
@@ -30,7 +29,6 @@ const profileSchema = new Schema({
   },
   userId: {
     type: String,
-    required: true,
   },
   createdAt: {
     type: Date,

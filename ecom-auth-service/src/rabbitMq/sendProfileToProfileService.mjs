@@ -7,7 +7,7 @@ export const sendProfileToProfileService = async (profileData) => {
   const queue = await channel.assertQueue("", { exclusive: true });
 
   channel.sendToQueue(
-    "ecommerce_microservice_user_profile",
+    "ecommerce_create_user_profile",
     Buffer.from(JSON.stringify(profileData)),
     { replyTo: queue.queue }
   );
