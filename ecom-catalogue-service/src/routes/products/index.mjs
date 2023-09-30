@@ -5,6 +5,7 @@ import express from "express";
 import Stocks from "../../models/stocks.mjs";
 import Category from "../../models/category.mjs";
 import { paginate } from "../../utils/index.mjs";
+import { sendProductForES } from "../../rabbitMq/sendProductForES.mjs";
 const productsRoutes = express.Router();
 
 // Update Product
@@ -52,7 +53,22 @@ productsRoutes.get("/:id", async (req, res) => {
     const product = await Product.findById(req.params.id)
       .populate("stocks")
       .populate("categories");
+
     if (!product) return res.status(404).send("Product not found");
+
+    if (product.translation && product.translation.length > 0) {
+      const translation = product.translation[0];
+
+      const productData = {
+        productId: product.id,
+        name: translation.name,
+        description: translation.description,
+        intraction: "views", 
+        userId: req.user.id,
+      };
+
+      await sendProductForES(productData);
+    }
     res.status(200).send(product);
   } catch (error) {
     res.status(500).send(error.message);
@@ -65,10 +81,7 @@ const createQueryFilter = (req) => {
   filter["isActive"] = true;
   filter["categories.isActive"] = true;
 
-  filter["$or"] = [
-      { "stocks.quantity": { "$gt": 0 } },
-      { "quantity": { "$gt": 0 } }
-  ];
+  filter["$or"] = [{ "stocks.quantity": { $gt: 0 } }, { quantity: { $gt: 0 } }];
 
   if (category) filter["categories.name"] = category;
   if (title) filter["translations.name"] = new RegExp(title, "i");
@@ -78,15 +91,18 @@ const createQueryFilter = (req) => {
 };
 
 // Usage in your route
-productsRoutes.get("/", paginate(Product, ["stocks", "translations", "categories"]), (req, res) => {
-  try {
+productsRoutes.get(
+  "/",
+  paginate(Product, ["stocks", "translations", "categories"]),
+  (req, res) => {
+    try {
       req.query.filter = createQueryFilter(req);
       res.status(200).send(req.paginatedResults);
-  } catch (error) {
+    } catch (error) {
       res.status(500).send(error.message);
+    }
   }
-});
-
+);
 
 // Create Product
 productsRoutes.post("/", verifyTokenAndAuthorization, async (req, res) => {
@@ -102,6 +118,7 @@ productsRoutes.post("/", verifyTokenAndAuthorization, async (req, res) => {
         product.categories = categories.map((category) => category._id);
       }
       await product.save();
+
       res.status(201).send(product);
     } catch (error) {
       res.status(500).send(error.message);

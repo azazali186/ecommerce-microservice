@@ -4,8 +4,8 @@ import { Op } from "sequelize";
 
 import { esClient } from "../config/esClient";
 import Product from "../models/product.mjs";
-import Interaction from "../models/interaction.mjs";
-import { getInteractionValue } from "./trainTensorFlowModel.mjs";
+import Intraction from "../models/intraction.mjs";
+import { getIntractionValue } from "./trainTensorFlowModel.mjs";
 
 export const getMethodName = (key) => {
   switch (key) {
@@ -134,12 +134,12 @@ export const updateEs = async (id, name, body) => {
   }
 }
 
-async function createInteraction(productId, userId, intraction) {
-  return await Interaction.create({
+async function createIntraction(productId, userId, intraction) {
+  return await Intraction.create({
     productId: productId,
     userId: userId,
     type: intraction,
-    rating: getInteractionValue(intraction),
+    rating: getIntractionValue(intraction),
   }).save();
 }
 
@@ -151,7 +151,7 @@ export const createProductData = async (productId, name, description, intraction
     description: description,
   }).save();
 
-  await createInteraction(product.id, userId, intraction);
+  await createIntraction(product.id, userId, intraction);
   await createEs("products", product)
   // Train/update your TensorFlow model
   try {

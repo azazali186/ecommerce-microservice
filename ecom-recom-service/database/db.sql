@@ -24,7 +24,7 @@ CREATE TABLE permissions (
     updatedAt TIMESTAMP NOT NULL
 );
 
--- Interaction table creation
+-- Intraction table creation
 CREATE TABLE interactions (
     id VARCHAR(255) PRIMARY KEY,
     rating FLOAT DEFAULT 0.0,

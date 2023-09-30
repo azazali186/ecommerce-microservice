@@ -1,7 +1,7 @@
 import tf from "@tensorflow/tfjs-node";
 import User from "../models/user.mjs";
 import Product from "../models/product.mjs";
-import Interaction from "../models/interaction.mjs";
+import Intraction from "../models/intraction.mjs";
 
 import { db } from "../config/db";
 import { Op } from "sequelize";
@@ -21,12 +21,12 @@ const saveEmbeddingsToMongo = async (embeddings, collectionName) => {
   await collection.insertOne(modelJSON);
 };
 
-export const getInteractionValue = (interaction) => {
+export const getIntractionValue = (interaction) => {
   return WEIGHTS[interaction] || 0;
 };
 
 const createUserItemMatrix = async (userId) => {
-  const interactions = await Interaction.findAll();
+  const interactions = await Intraction.findAll();
   const users = await User.findOne({ where: { userId: userId } });
   const products = await Product.findAll();
 
@@ -40,7 +40,7 @@ const createUserItemMatrix = async (userId) => {
     const productIndex = products.findIndex(
       (p) => p.id === interaction.productId
     );
-    const weight = getInteractionValue[interaction.type];
+    const weight = getIntractionValue[interaction.type];
 
     matrix[userIndex][productIndex] += weight;
   });
@@ -114,7 +114,7 @@ export const getRecommandedProducts = async (userId = null, topN = 10) => {
 export const trainTensorFlowModel = async () => {
   const users = await User.findAll();
   const products = await Product.findAll();
-  const interactions = await Interaction.findAll();
+  const interactions = await Intraction.findAll();
 
   const numUsers = users.length;
   const numProducts = products.length;
@@ -150,7 +150,7 @@ export const trainTensorFlowModel = async () => {
 
   for (let epoch = 0; epoch < 1000; epoch++) {
     optimizer.minimize(() => {
-      const predictedInteractions = tf.matMul(
+      const predictedIntractions = tf.matMul(
         userEmbeddings,
         productEmbeddings,
         true,
@@ -158,7 +158,7 @@ export const trainTensorFlowModel = async () => {
       );
       const loss = tf.losses.meanSquaredError(
         interactionMatrix,
-        predictedInteractions
+        predictedIntractions
       );
       return loss;
     });
@@ -176,7 +176,7 @@ export const getPastProductsForUser = async (userId) => {
 
   try {
     // Fetch interactions for a specific user where the interaction type is 'purchased'
-    const interactions = await Interaction.findAll({
+    const interactions = await Intraction.findAll({
       where: { userId: userId, type: "purchased" },
       include: Product, // Join with products to get product details
     });

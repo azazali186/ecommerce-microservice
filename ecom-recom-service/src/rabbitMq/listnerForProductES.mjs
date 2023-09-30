@@ -1,4 +1,5 @@
 import { createProductData } from "../utils/index.mjs";
+import { connect } from 'amqplib';
 
 export const listnerForProductES = async () => {
   const connection = await connect(process.env.RABBIT_MQ_URL || "amqp://localhost");

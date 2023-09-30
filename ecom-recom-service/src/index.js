@@ -16,7 +16,7 @@ import Product from './models/product.mjs';
 const app = express();
 
 import { inserData } from './utils/index.mjs';
-import Interaction from './models/interaction.mjs';
+import Intraction from './models/interaction.mjs';
 
 
 app.use(express.json());
@@ -29,13 +29,10 @@ eurekaClient.start(error => {
   console.log(error || 'Eureka registration complete');
 });
 
-User.belongsToMany(Product, { through: UserInteraction });
-Product.belongsToMany(User, { through: UserInteraction });
-
-User.hasMany(Interaction);
-Product.hasMany(Interaction);
-Interaction.belongsTo(User);
-Interaction.belongsTo(Product);
+User.hasMany(Intraction);
+Product.hasMany(Intraction);
+Intraction.belongsTo(User);
+Intraction.belongsTo(Product);
 
 
 sequelize.sync();

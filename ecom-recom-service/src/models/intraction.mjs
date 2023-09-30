@@ -2,9 +2,9 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/sequelize.mjs";
 import { v4 as uuidv4 } from "uuid";
 
-class Interaction extends Model {}
+class Intraction extends Model {}
 
-Interaction.init(
+Intraction.init(
   {
     id: {
       type: DataTypes.STRING,
@@ -34,9 +34,9 @@ Interaction.init(
   },
   {
     sequelize,
-    modelName: "Interaction",
-    tableName: "interactions",
+    modelName: "Intraction",
+    tableName: "intractions",
   }
 );
 
-export default Interaction;
+export default Intraction;
