@@ -67,15 +67,11 @@ catalogsRoutes.get("/:id", verifyTokenAndAuthorization, async (req, res) => {
 });
 
 // Get All Catalogs
-catalogsRoutes.get("/", verifyTokenAndAuthorization, async (req, res) => {
+catalogsRoutes.get("/", verifyTokenAndAuthorization,paginate(Catalog), async (req, res) => {
     const { new: isNew } = req.query;
 
     try {
-        const catalog = isNew
-            ? await Catalog.find({ limit: 1, order: [['createdAt', 'DESC']] })
-            : await Catalog.find();
-
-        res.status(200).json(catalog);
+        res.status(200).json(req.paginatedResults);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal server error" });

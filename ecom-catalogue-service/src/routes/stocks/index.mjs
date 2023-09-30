@@ -1,6 +1,6 @@
 import { verifyTokenAndAuthorization } from "../../middleware/verifyToken.mjs";
 import Stock from "../../models/stocks.mjs";
-
+import { paginate } from "../../utils/index.mjs";
 import express from "express";
 const stocksRoutes = express.Router();
 
@@ -86,34 +86,32 @@ const validateStocksQuery = (req, res, next) => {
   next(); // If all validations pass, proceed to the next middleware/route handler
 };
 
+const createQueryFilter = (req) => {
+  const { sku, name } = req.query;
+  let filter = {};
+  filter["isActive"] = true;
+  filter["categories.isActive"] = true;
+
+  filter["$or"] = [
+      { "stocks.quantity": { "$gt": 0 } }
+  ];
+
+  if (name) filter["translations.name"] = new RegExp(name, "i");
+  if (sku) filter["sku"] = new RegExp(sku, "i");
+
+  return filter;
+};
+
 // Get All Stocks
 stocksRoutes.get(
   "/",
   validateStocksQuery,
   verifyTokenAndAuthorization,
+  paginate(Stock, ["translations"]),
   async (req, res) => {
     try {
-      const { page = 1, limit = 10, sku, name } = req.query;
-      const pageNumber = parseInt(page, 10);
-      const resultsLimit = parseInt(limit, 10);
-
-      const query = {};
-      if (sku) query.sku = sku;
-      if (name) query.name = new RegExp(name, "i");
-
-      const stocks = await Stock.find(query)
-        .skip((pageNumber - 1) * resultsLimit)
-        .limit(resultsLimit);
-      const total = await Stock.countDocuments(query);
-
-      res.status(200).send({
-        data: stocks,
-        meta: {
-          total: total,
-          currentPage: pageNumber,
-          totalPages: Math.ceil(total / resultsLimit),
-        },
-      });
+      req.query.filter = createQueryFilter(req);
+      res.status(200).send(req.paginatedResults);
     } catch (error) {
       res.status(500).send(error.message);
     }

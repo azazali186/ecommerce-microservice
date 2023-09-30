@@ -28,6 +28,12 @@ const stocksSchema = new Schema({
       type: String,
     },
   ],
+  quantity: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
   variations: [
     {
       type: Schema.Types.String,

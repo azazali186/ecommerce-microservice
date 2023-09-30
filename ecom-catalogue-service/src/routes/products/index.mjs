@@ -4,6 +4,7 @@ import Product from "../../models/product.mjs";
 import express from "express";
 import Stocks from "../../models/stocks.mjs";
 import Category from "../../models/category.mjs";
+import { paginate } from "../../utils/index.mjs";
 const productsRoutes = express.Router();
 
 // Update Product
@@ -58,49 +59,34 @@ productsRoutes.get("/:id", async (req, res) => {
   }
 });
 
-// Get All Products
-productsRoutes.get("/", async (req, res) => {
+const createQueryFilter = (req) => {
+  const { category, sku, title } = req.query;
+  let filter = {};
+  filter["isActive"] = true;
+  filter["categories.isActive"] = true;
+
+  filter["$or"] = [
+      { "stocks.quantity": { "$gt": 0 } },
+      { "quantity": { "$gt": 0 } }
+  ];
+
+  if (category) filter["categories.name"] = category;
+  if (title) filter["translations.name"] = new RegExp(title, "i");
+  if (sku) filter["sku"] = new RegExp(sku, "i");
+
+  return filter;
+};
+
+// Usage in your route
+productsRoutes.get("/", paginate(Product, ["stocks", "translations", "categories"]), (req, res) => {
   try {
-    // Extract query parameters
-    const { category, sku, startDate, endDate, title } = req.query;
-
-    // Initialize the query object
-    let query = {};
-
-    // Populate the query object based on provided filters
-    if (category) query["categories.name"] = category; // Assuming category names are unique
-    if (title) query["title"] = new RegExp(title, "i"); // This will allow for case-insensitive partial matching
-
-    if (startDate || endDate) {
-      query["createdAt"] = {};
-
-      if (startDate) {
-        query["createdAt"]["$gte"] = new Date(startDate);
-      }
-
-      if (endDate) {
-        query["createdAt"]["$lte"] = new Date(endDate);
-      }
-    }
-
-    // Fetch the products
-    const products = await Product.find(query)
-      .populate({
-        path: "stocks",
-        match: sku ? { sku: sku } : {}, // Filter embedded documents by SKU
-      })
-      .populate("categories");
-
-    // Filter out products that didn't match the SKU query
-    const filteredProducts = products.filter(
-      (product) => product.stocks.length > 0
-    );
-
-    res.status(200).send(filteredProducts);
+      req.query.filter = createQueryFilter(req);
+      res.status(200).send(req.paginatedResults);
   } catch (error) {
-    res.status(500).send(error.message);
+      res.status(500).send(error.message);
   }
 });
+
 
 // Create Product
 productsRoutes.post("/", verifyTokenAndAuthorization, async (req, res) => {

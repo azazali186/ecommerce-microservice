@@ -67,20 +67,20 @@ categoriesRoutes.get("/:id", verifyTokenAndAuthorization, async (req, res) => {
 });
 
 // Get All Categorys
-categoriesRoutes.get("/", verifyTokenAndAuthorization, async (req, res) => {
-    const { new: isNew } = req.query;
-
-    try {
-        const category = isNew
-            ? await Category.find({ limit: 1, order: [['createdAt', 'DESC']] })
-            : await Category.find();
-
-        res.status(200).json(category);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Internal server error" });
+categoriesRoutes.get("/", 
+    verifyTokenAndAuthorization, 
+    paginate(Category), // Add paginate middleware here
+    async (req, res) => {
+        try {
+            // Already fetched paginated results from the middleware
+            res.status(200).json(req.paginatedResults);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: "Internal server error" });
+        }
     }
-});
+);
+
 
 // Create Category
 categoriesRoutes.post('/', verifyTokenAndAuthorization, async (req, res) => {

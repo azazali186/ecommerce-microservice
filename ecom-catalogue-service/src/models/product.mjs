@@ -12,6 +12,23 @@ const productSchema = new Schema({
     type: Boolean,
     default: false
   },
+  translation: [
+    {
+      type: Schema.Types.String,
+      ref: "translations",
+    },
+  ],
+  sku:{
+    type: String,
+    default: "",
+    required: true
+  },
+  quantity: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
   stock: [{
     type: Schema.Types.String,
     ref: 'stocks'
@@ -24,6 +41,10 @@ const productSchema = new Schema({
     type: Schema.Types.String,
     ref: 'productMetaData'
   }],
+  isActive: {
+    type: Boolean,
+    default: true
+  },
   createdAt: {
     type: Date,
     default: Date.now
