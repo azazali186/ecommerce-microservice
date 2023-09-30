@@ -1,0 +1,8 @@
+server:
+  port: 3088
+
+spring:
+  profiles:
+    active: native
+  application:
+    name: ecom-config-server

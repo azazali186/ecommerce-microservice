@@ -1,0 +1,26 @@
+{
+  "name": "profile-service",
+  "version": "1.0.0",
+  "description": "This is the profile service for skd microservice project",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --legacy-watch src/index.js"
+  },
+  "author": "Ali Azaz M",
+  "license": "MIT",
+  "dependencies": {
+    "amqplib": "latest",
+    "cors": "latest",
+    "crypto-js": "latest",
+    "dotenv": "latest",
+    "eureka-js-client": "latest",
+    "express": "latest",
+    "express-list-routes": "latest",
+    "jsonwebtoken": "latest",
+    "mongoose": "latest",
+    "nodemon": "latest",
+    "uuid": "latest"
+  }
+}

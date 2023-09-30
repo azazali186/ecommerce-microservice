@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: ecom-api-gateway
+  config:
+    import: "optional:configserver:http://localhost:8088"
