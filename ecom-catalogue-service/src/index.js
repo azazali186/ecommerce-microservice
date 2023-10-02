@@ -38,7 +38,7 @@ import productsRoutes from "./routes/products/index.mjs"
 import stocksRoutes from "./routes/stocks/index.mjs"
 import categoriesRoutes from "./routes/categories/index.mjs"
 
-var whitelist = ["http://localhost:8000", "http://localhost:8080"];
+/* var whitelist = ["http://localhost:8000", "http://localhost:8080"];
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
@@ -51,7 +51,7 @@ const corsOptions = {
   credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };
-app.use(cors(corsOptions));
+app.use(cors(corsOptions)); */
 
 app.use("/api/catalogue-service/products", productsRoutes);
 app.use("/api/catalogue-service/stocks", stocksRoutes);

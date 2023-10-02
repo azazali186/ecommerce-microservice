@@ -40,7 +40,7 @@ mongoose
     console.error("Error connecting to MongoDB", err);
   });
 
-var whitelist = ["http://localhost:8000", "http://localhost:8080"];
+/* var whitelist = ["http://localhost:8000", "http://localhost:8080"];
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
@@ -53,7 +53,7 @@ const corsOptions = {
   credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };
-app.use(cors(corsOptions));
+app.use(cors(corsOptions)); */
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 app.use(
   "/uploads",

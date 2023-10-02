@@ -3,8 +3,24 @@ spring:
     name: ecom-api-gateway
   config:
     import: "optional:configserver:http://localhost:8088"
-
-
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':   # this matches all paths
+            allowedOriginPatterns: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+logging:
+  level:
+    org.springframework.web.cors: DEBUG
 server:
   port: 3099
 

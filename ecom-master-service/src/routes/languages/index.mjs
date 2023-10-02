@@ -71,7 +71,7 @@ languagesRoutes.get("/:id", verifyTokenAndAuthorization, async (req, res) => {
 });
 
 // Get All Languages
-languagesRoutes.get("/", verifyTokenAndAuthorization, async (req, res) => {
+languagesRoutes.get("/", async (req, res) => {
     const { new: isNew } = req.query;
 
     try {
