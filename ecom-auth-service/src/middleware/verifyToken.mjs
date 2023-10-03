@@ -20,9 +20,11 @@ export const verifyTokenAndAuthorization = (req, res, next) => {
   verifyToken(req, res, async () => {
     let granted = false;
 
+    console.log("User is ", req.user)
+
     if(req.user.role != 'admin' || req.user.id != req.params.id ){
       let role = await Role.findOne({
-        name: req.user.role
+        name: req.user?.role
       })
       let permissions = role?.permissions
   
@@ -30,14 +32,14 @@ export const verifyTokenAndAuthorization = (req, res, next) => {
       if (name.endsWith('-')) {
         name = name.slice(0, -1);
       }
-      permissions.map((p)=>{
+      permissions?.map((p)=>{
         if(name == p.name){
           granted = true
         }
       })
     }
 
-    if (req.user.id === req.params.id || req.user.role == 'admin' || granted) {
+    if (req.user.id === req.params.id || req.user?.role == 'admin' || granted) {
       next();
     } else {
       res.status(403).json({

@@ -6,37 +6,37 @@ import User from "../../models/user.mjs";
 import Role from "../../models/roles.mjs";
 import CryptoJS from "crypto-js";
 import express from "express";
-const usersRoutes = express.Router();
+import { Op, fn, col } from "sequelize";
+import { sendProfileToProfileService } from "../../rabbitMq/sendProfileToProfileService.mjs";
+const membersRoutes = express.Router();
 
 // User Stats
 
-usersRoutes.get("/stats", verifyTokenAndAdmin, async (req, res) => {
+membersRoutes.get("/stats", verifyTokenAndAdmin, async (req, res) => {
   const date = new Date();
   const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
 
   try {
     const data = await User.findAll({
-        attributes: [
-          [fn('MONTH', col('createdAt')), 'month'],
-          [fn('COUNT', col('User.id')), 'total']
-        ],
-        include: [{
-          model: Role,
-          attributes: [],  // empty attributes to exclude the Role fields in the result
-          where: {
-            name: {
-                [Op.ne]: 'admin'  // 'ne' stands for 'not equal'
-            }
-        }
-        }],
+      attributes: [
+        [fn('MONTH', col('createdAt')), 'month'],
+        [fn('COUNT', col('User.id')), 'total']
+      ],
+      include: [{
+        model: Role,
+        attributes: [],  // empty attributes to exclude the Role fields in the result
         where: {
-          createdAt: {
-            [Op.gte]: lastYear
-          }
-        },
-        group: [fn('MONTH', col('createdAt'))],
-        order: [fn('MONTH', col('createdAt'))]
-      });
+          name: 'customer'
+        }
+      }],
+      where: {
+        createdAt: {
+          [Op.gte]: lastYear
+        }
+      },
+      group: [fn('MONTH', col('createdAt'))],
+      order: [fn('MONTH', col('createdAt'))]
+    });
     res.status(200).json(data);
   } catch (err) {
     res.status(500).json(err);
@@ -45,7 +45,7 @@ usersRoutes.get("/stats", verifyTokenAndAdmin, async (req, res) => {
 
 // Update user
 
-usersRoutes.patch("/:id", verifyTokenAndAuthorization, async (req, res) => {
+membersRoutes.patch("/:id", verifyTokenAndAuthorization, async (req, res) => {
   if (req.body.password) {
     req.body.password = CryptoJS.AES.encrypt(
       req.body.password,
@@ -71,11 +71,11 @@ usersRoutes.patch("/:id", verifyTokenAndAuthorization, async (req, res) => {
 
 // delete user
 
-usersRoutes.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
+membersRoutes.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
     res.status(200).json({
-      message: "User deleted Successfully",
+      message: "Member deleted Successfully",
     });
   } catch (err) {
     res.status(500).json(err);
@@ -84,7 +84,7 @@ usersRoutes.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
 
 // get user
 
-usersRoutes.get("/:id", verifyTokenAndAuthorization, async (req, res) => {
+membersRoutes.get("/:id", verifyTokenAndAuthorization, async (req, res) => {
   try {
     const updatedUser = await User.findById(req.params.id);
 
@@ -98,21 +98,21 @@ usersRoutes.get("/:id", verifyTokenAndAuthorization, async (req, res) => {
 
 // Get All Users
 
-usersRoutes.get("/", verifyTokenAndAuthorization, async (req, res) => {
+membersRoutes.get("/", verifyTokenAndAuthorization, async (req, res) => {
   try {
-    
     const users = await User.findAll({
       include: [
         {
           model: Role,
           attributes: ["id", "name", "isActive"],
           where: {
-            name: 'admin',
+            name: "customer",
           },
         },
       ],
     });
-    console.log("req get here ",users);
+    console.log("req get here ", users);
+    
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json(err);
@@ -121,10 +121,11 @@ usersRoutes.get("/", verifyTokenAndAuthorization, async (req, res) => {
 
 // Create Users
 
-usersRoutes.post("/", verifyTokenAndAdmin, async (req, res) => {
+membersRoutes.post("/", verifyTokenAndAdmin, async (req, res) => {
   try {
+    const { email, password, name } = req.body;
     let users = await User.findOne({
-      email: req.body.email.toLowerCase(),
+      email: email.toLowerCase(),
     });
 
     if (users) {
@@ -134,21 +135,32 @@ usersRoutes.post("/", verifyTokenAndAdmin, async (req, res) => {
       return false;
     }
     let role = await Role.findOne({
-      name: req.body.role.toLowerCase(),
+      name: 'customer',
     });
     const newUser = new User({
-      email: req.body.email.toLowerCase(),
+      email: email.toLowerCase(),
       password: CryptoJS.AES.encrypt(
-        req.body.password,
+        password,
         process.env.PASS_SEC
       ).toString(),
       role: role._id,
     });
     const createdUser = await newUser.save();
+    // Send profile to profile service
+    const profileData = { userId: createdUser.id, name };
+    const profileResponse = await sendProfileToProfileService(profileData);
+
+    if (!profileResponse || !JSON.parse(profileResponse).userProfile) {
+      throw new Error("Profile creation failed.");
+    }
+
+    createdUser.dataValues.profile = JSON.parse(profileResponse).userProfile;
+    
+    
     res.status(201).json(createdUser);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-export default usersRoutes;
+export default membersRoutes;

@@ -40,6 +40,7 @@ Role.belongsToMany(Permission, { through: 'rolePermissions' });
 Permission.belongsToMany(Role, { through: 'rolePermissions' });
 
 import usersRoutes from "./routes/users/index.mjs";
+import customersRoutes from "./routes/customers/index.mjs";
 import authRoutes from "./routes/auth/index.mjs";
 
 import roleRoutes from "./routes/roles/index.mjs"
@@ -61,6 +62,7 @@ const corsOptions = {
 app.use(cors(corsOptions)); */
 
 app.use("/api/auth-service/users", usersRoutes);
+app.use("/api/auth-service/members", customersRoutes);
 app.use("/api/auth-service/auth", authRoutes);
 app.use("/api/auth-service/roles", roleRoutes);
 app.use("/api/auth-service/permissions", permissionRoutes);
