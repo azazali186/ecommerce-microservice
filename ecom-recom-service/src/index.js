@@ -29,10 +29,11 @@ eurekaClient.start(error => {
   console.log(error || 'Eureka registration complete');
 });
 
-User.hasMany(Intraction);
-Product.hasMany(Intraction);
-Intraction.belongsTo(User);
-Intraction.belongsTo(Product);
+User.hasMany(Intraction, { foreignKey: 'userId' });
+Product.hasMany(Intraction, { foreignKey: 'productId' });
+Intraction.belongsTo(User, { foreignKey: 'userId' });
+Intraction.belongsTo(Product, { foreignKey: 'productId' });
+
 
 
 sequelize.sync();

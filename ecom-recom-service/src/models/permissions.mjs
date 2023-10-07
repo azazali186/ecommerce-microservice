@@ -23,11 +23,6 @@ Permission.init({
     allowNull: false,
     defaultValue: 'web'
   },
-  service: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: 'auth-service'
-  },
   createdAt: {
     allowNull: false,
     type: DataTypes.DATE

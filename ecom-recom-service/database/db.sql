@@ -19,7 +19,6 @@ CREATE TABLE permissions (
     path VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     guard VARCHAR(255) NOT NULL DEFAULT 'web',
-    service VARCHAR(255) NOT NULL DEFAULT 'auth-service',
     createdAt TIMESTAMP NOT NULL,
     updatedAt TIMESTAMP NOT NULL
 );

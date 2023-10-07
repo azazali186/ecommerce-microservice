@@ -13,20 +13,26 @@ Intraction.init(
     },
     rating: {
       type: DataTypes.FLOAT,
-      required: false,
-      default : 0.0
-    },
+      allowNull: true,
+      defaultValue: 0.0
+   },
     userId: {
       type: DataTypes.STRING,
-      required: true,
-      references: 'users',
-
-    },
-    productId: {
+      allowNull: false,
+      references: {
+         model: 'users',
+         key: 'id'
+      }
+   },
+   productId: {
       type: DataTypes.STRING,
-      required: true,
-      references: 'products',
-    },
+      allowNull: false,
+      references: {
+         model: 'products',
+         key: 'id'
+      }
+   },
+   
     type: {
       type: DataTypes.STRING,
       required: true,

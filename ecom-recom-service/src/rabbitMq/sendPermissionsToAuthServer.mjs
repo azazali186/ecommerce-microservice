@@ -3,7 +3,7 @@ import Permission from "../models/permissions.mjs";
 
 export const sendPermissionsToAuthServer = async () => {
 
-  const permissions = await Permission.find();
+  const permissions = await Permission.findAll();
 
   const connection = await amqp.connect(process.env.RABBIT_MQ_URL || "amqp://localhost");
   const channel = await connection.createChannel();
