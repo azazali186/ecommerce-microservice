@@ -3,7 +3,7 @@ import User from "../models/user.mjs";
 import Product from "../models/product.mjs";
 import Intraction from "../models/intraction.mjs";
 
-import { db } from "../config/db";
+import { db } from "../config/db.js";
 import { Op } from "sequelize";
 import { requestProducts } from "../rabbitMq/requestProducts.mjs";
 

@@ -1,16 +1,19 @@
-server:
-  port: 3099
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':   # this matches all paths
+            allowedOriginPatterns: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:3145/eureka/  # Eureka server location
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"  # Expose all actuator endpoints, be cautious with this in production
-  tracing:
-    sampling:
-      probability: 1.0  # Setting tracing sampling to 100%
+

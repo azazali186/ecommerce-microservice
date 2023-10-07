@@ -1,8 +1,7 @@
 import Permissions from "../models/permissions.mjs";
-import Role from "../models/roles.mjs";
 import { Op } from "sequelize";
 
-import { esClient } from "../config/esClient";
+import { esClient } from "../config/esClient.js";
 import Product from "../models/product.mjs";
 import Intraction from "../models/intraction.mjs";
 import { getIntractionValue } from "./trainTensorFlowModel.mjs";
@@ -27,31 +26,6 @@ export const getMethodName = (key) => {
       break;
   }
 };
-
-export async function getRoleData() {
-  try {
-    let adminRole = await Role.findOne({ where: { name: "admin" } });
-    let permissions = await Permissions.findAll();
-    
-    if (!adminRole) {
-        adminRole = await Role.create({
-        name: "admin",
-        permissions: permissions,
-      });
-    } else {
-      adminRole.setPermissions(permissions);
-    }
-
-    await adminRole.save();
-
-    let customerRole = await Role.findOne({ where: { name: "customer" } });
-    if (!customerRole) {
-      await Role.create({ name: "customer" });
-    }
-  } catch (error) {
-    console.error("Error in getRoleData:", error);
-  }
-}
 
 const getPermissionsData = async (expressListRoutes, app) => {
   const allRoute = expressListRoutes(app);
@@ -101,7 +75,6 @@ const getPermissionsData = async (expressListRoutes, app) => {
 
 export const inserData = async (expressListRoutes, app) => {
   getPermissionsData(expressListRoutes, app);
-  await getRoleData();
 };
 
 
@@ -166,4 +139,4 @@ export const createProductData = async (productId, name, description, intraction
   return product
 }
 
-export default { getMethodName, inserData, getRoleData };
+export default { getMethodName, inserData };

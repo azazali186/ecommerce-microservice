@@ -1,39 +1,48 @@
 spring:
   application:
     name: ecom-api-gateway
-  config:
-    import: "optional:configserver:http://localhost:8088"
   cloud:
     gateway:
-      globalcors:
-        corsConfigurations:
-          '[/**]':   # this matches all paths
-            allowedOriginPatterns: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders:
-              - "*"
-            allowCredentials: true
+      routes:
+      - id: auth-service-route
+        uri: lb://ECOM-AUTH-SERVICE/
+        predicates:
+        - Path=/api/auth-service/**
+      - id: master-service-route
+        uri: lb://ECOM-MASTER-SERVICE/
+        predicates:
+        - Path=/api/master-service/**
+      - id: profile-service-route
+        uri: lb://ECOM-PROFILE-SERVICE/
+        predicates:
+        - Path=/api/profile-service/**
+      - id: file-service-route
+        uri: lb://ECOM-FILE-SERVICE/
+        predicates:
+        - Path=/api/file-service/**
+      - id: catalog-service-route
+        uri: lb://ECOM-CATALOGUE-SERVICE/
+        predicates:
+        - Path=/api/catalog-service/**
+      - id: recom-service-route
+        uri: lb://ECOM-RECOM-SERVICE/
+        predicates:
+        - Path=/api/recom-service/**
+  config:
+    import: "optional:configserver:http://localhost:3088"
+
 logging:
   level:
     org.springframework.web.cors: DEBUG
+    org.springframework.boot.actuate: DEBUG
 server:
   port: 3099
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:3145/eureka/  # Eureka server location
-
 management:
   endpoints:
     web:
       exposure:
-        include: "*"  # Expose all actuator endpoints, be cautious with this in production
-  tracing:
-    sampling:
-      probability: 1.0
+        include: "*"
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:3145/eureka/  # Eureka server location 

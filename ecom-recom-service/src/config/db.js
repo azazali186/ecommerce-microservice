@@ -4,7 +4,7 @@ const url = 'mongodb://localhost:27017';
 const dbName = 'tensorflow-training';
 export let db;
 
-MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
+MongoClient.connect(url, (err, client) => {
     if (err) {
         console.error(err);
         process.exit(1);

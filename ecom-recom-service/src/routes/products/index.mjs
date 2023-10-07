@@ -1,14 +1,13 @@
 import Product from "../../models/product.mjs";
 import express from "express";
 const productsRoutes = express.Router();
-import { esClient } from "../../config/esClient";
 import {
   getPastProductsForUser,
   getRecommandedProducts,
   trainTensorFlowModel,
 } from "../../utils/trainTensorFlowModel.mjs";
 import tf from "@tensorflow/tfjs-node";
-import { requestProducts } from "../rabbitMq/requestProducts.mjs";
+import { requestProducts } from "../../rabbitMq/requestProducts.mjs";
 import { createProductData, updateEs } from "../../utils/index.mjs";
 
 // Create a new product in PostgreSQL and index it in Elasticsearch

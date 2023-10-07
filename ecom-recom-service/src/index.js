@@ -51,8 +51,9 @@ const corsOptions = {
   optionSuccessStatus: 200,
 };
 app.use(cors(corsOptions)); */
+import productsRoutes from './routes/products/index.mjs'
 
-app.use("/api/recommendation-service/permissions", permissionRoutes);
+app.use("/api/recommendation-service/products", productsRoutes);
 await inserData(expressListRoutes, app);
 
 rabbitMQListener();
