@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 
-const sequelize = new Sequelize(process.env.DATABASE_URL || "postgres://janny:Aj189628@@192.168.30.28:3155/ecom-auth-service", {
+const sequelize = new Sequelize(process.env.DATABASE_URL || "postgres://janny:Aj189628@@master-db-service:5432/ecom-auth-service", {
   dialect: 'postgres'
 });
 

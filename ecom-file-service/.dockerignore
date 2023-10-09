@@ -1,0 +1,26 @@
+# Log files
+npm-debug.log
+yarn-error.log
+
+# Dependency directories
+node_modules/
+
+# Environment configs and secrets
+# .env
+
+# Editor directories
+.vscode/
+.idea/
+
+# Cache directories (uncomment if they exist and are not needed)
+# .npm/
+# .cache/
+
+# Operating System Files
+.DS_Store
+*.swp
+*.swo
+
+# Dist/build folders, in case you are compiling TypeScript or using a build tool
+dist/
+build/

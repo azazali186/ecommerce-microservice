@@ -1,6 +1,34 @@
 version: '3'
 
 services:
+# Databases configurations
+  
+  ecom-mongo-db:
+    image: mongo:latest
+    container_name: ecom-mongo-container
+    ports:
+      - "3153:27017"
+    volumes:
+      - mongodata:/data/db
+
+  ecom-zipkin-storage:
+    platform: linux/arm64
+    image: openzipkin/zipkin-mysql
+    container_name: zipkin-playground-mysql
+    ports:
+      - 3154:3306
+
+  ecom-master-db-service:
+    image: timescale/timescaledb:latest-pg15
+    environment:
+      POSTGRES_PASSWORD: Aj189628@
+      POSTGRES_USER: janny
+    ports:
+      - 3155:5432
+    volumes:
+      - ecommerce-microservice_timescale_data:/var/lib/postgresql/data
+
+# Prometheus configuration
   prometheus:
     image: prom/prometheus:latest
     container_name: ecom-prometheus
@@ -9,32 +37,14 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
-      - 3098:9090
+      - 3198:9090
   grafana:
     image: grafana/grafana:latest
     container_name: ecom-grafana
     ports:
-      - 3097:3000
-
-  ecom-zipkin-storage:
-    platform: linux/arm64
-    # image: mysql:latest
-    # command: --default-authentication-plugin=mysql_native_password
-    # restart: always
-    # container_name: zipkin-playground-mysql
-    # environment:
-    #   - MYSQL_ROOT_PASSWORD=Aj189628@
-    #   - MYSQL_DATABASE=zipkin
-    #   - MYSQL_USER=zipkin
-    #   - MYSQL_PASSWORD=Aj189628@
-    # ports:
-    #   - 3154:3306
-    image: openzipkin/zipkin-mysql
-    container_name: zipkin-playground-mysql
-    # Uncomment to expose the storage port for testing
-    ports:
-      - 3154:3306
-
+      - 3197:3000
+# Zipkin configuration
+  
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin-playground-zipkin
@@ -42,15 +52,13 @@ services:
       - STORAGE_TYPE=mysql
       - MYSQL_USER=zipkin
       - MYSQL_PASS=zipkin
-      - MYSQL_HOST=192.168.30.28
-      - MYSQL_JDBC_URL=jdbc:mysql://192.168.30.28:3154/zipkin?passwordCharacterEncoding=UTF-8&useGssapiServerConnection=false
-
+      - MYSQL_HOST=ecom-zipkin-storage
+      - MYSQL_JDBC_URL=jdbc:mysql://ecom-zipkin-storage:3306/zipkin?passwordCharacterEncoding=UTF-8&useGssapiServerConnection=false
     ports:
       - 3192:9411
     depends_on:
       - ecom-zipkin-storage
-
-
+#  ELK configuration
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
     environment:
@@ -58,8 +66,6 @@ services:
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - ELASTIC_USERNAME=elastic
       - ELASTIC_PASSWORD=Aj189628@
-    ports:
-      - 3195:9200
 
   fluentd:
     build: ./fluentd
@@ -76,15 +82,53 @@ services:
     links:
       - "elasticsearch"
 
-  ecom-master-db-service:
-    image: timescale/timescaledb:latest-pg15
-    environment:
-      POSTGRES_PASSWORD: Aj189628@
-      POSTGRES_USER: janny
+# All Services Configuration
+  ecom-service-registry:
+    build:
+      context: .
+      dockerfile: './ecom-service-registry/Dockerfile'
     ports:
-      - 3155:5432
+      - "3145:3145"
     volumes:
-      - ecommerce-microservice_timescale_data:/var/lib/postgresql/data
+      - ecom-service-registry-volume:/app
+
+  ecom-config-server:
+    build:
+      context: .
+      dockerfile: './ecom-config-server/Dockerfile'
+    volumes:
+      - ecom-config-server-volume:/app
+
+  ecom-api-gateway:
+    build:
+      context: .
+      dockerfile: './ecom-api-gateway/Dockerfile'
+    ports:
+      - "3099:3099"
+    depends_on: 
+      - ecom-config-server
+    volumes:
+      - ecom-api-gateway-volume:/app
+
+  ecom-auth-service:
+    build:
+      context: .
+      dockerfile: './ecom-auth-service/Dockerfile'
+    environment:
+      DATABASE_URL: postgres://janny:Aj189628@@ecom-master-db-service:5432/ecom-auth-service
+      PORT: 3100
+      JWT_SECRET: Aj189628@
+      PASS_SECRET: Aj189628@
+    depends_on:
+      - ecom-master-db-service
+    volumes:
+      - ecom-auth-service-volume:/path/in/container
+
 volumes: 
   ecommerce-microservice_timescale_data:
     external: true
+  mongodata:
+  ecom-service-registry-volume:
+  ecom-config-server-volume:
+  ecom-api-gateway-volume:
+  ecom-auth-service-volume:

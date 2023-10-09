@@ -31,7 +31,7 @@ eurekaClient.start((error) => {
 });
 
 const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/image-service";
+  process.env.MONGODB_URI || "mongodb://localhost:27017/file-service";
 
 mongoose
   .connect(MONGODB_URI, {

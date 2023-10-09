@@ -51,4 +51,4 @@ management:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:3145/eureka/  # Eureka server location 
+      defaultZone: http://ecom-service-registry:3145/eureka/  # Eureka server location 
