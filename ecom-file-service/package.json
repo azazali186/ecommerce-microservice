@@ -22,6 +22,10 @@
     "mongoose": "latest",
     "multer": "latest",
     "nodemon": "latest",
-    "uuid": "latest"
+    "uuid": "latest",
+    "zipkin": "^0.22.0",
+    "zipkin-context-cls": "^0.22.0",
+    "zipkin-instrumentation-express": "^0.22.0",
+    "zipkin-transport-http": "^0.22.0"
   }
 }

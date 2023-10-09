@@ -14,7 +14,12 @@ import { inserData } from "./utils/index.mjs";
 import { Eureka } from "eureka-js-client";
 import eurekaConfig from "./config/eureka.js";
 
+import { zipkinMiddleware } from './config/zipkin.mjs';
+
+
 const app = express();
+
+app.use(zipkinMiddleware);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -6,7 +6,7 @@
 |------:|-------------------|-------|-------|--------------------|-------|-------|--------------------|-------|
 | 1     | API Gateway       | 3099  | 2     | Config             | 3088  | 3     | Eureka             | 3145  |
 | 4     | Files             | 3055  | 5     | Elastic Search     | 3200  | 6     | Recom              | 3199  |
-| 7     | Postgress         | 5556  | 8     | MongoDB            | 27027 | 9     | Auth Service       | 3110  |
+| 7     | Postgress         | 3155  | 8     | MongoDB            | 27027 | 9     | Auth Service       | 3110  |
 | 10    | Master Service    | 3110  | 11    | Profile service    | 3120  | 12    | catalogue Service  | 3130  |
 
 

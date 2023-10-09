@@ -15,3 +15,76 @@ services:
     container_name: ecom-grafana
     ports:
       - 3097:3000
+
+  ecom-zipkin-storage:
+    platform: linux/arm64
+    # image: mysql:latest
+    # command: --default-authentication-plugin=mysql_native_password
+    # restart: always
+    # container_name: zipkin-playground-mysql
+    # environment:
+    #   - MYSQL_ROOT_PASSWORD=Aj189628@
+    #   - MYSQL_DATABASE=zipkin
+    #   - MYSQL_USER=zipkin
+    #   - MYSQL_PASSWORD=Aj189628@
+    # ports:
+    #   - 3154:3306
+    image: openzipkin/zipkin-mysql
+    container_name: zipkin-playground-mysql
+    # Uncomment to expose the storage port for testing
+    ports:
+      - 3154:3306
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin-playground-zipkin
+    environment:
+      - STORAGE_TYPE=mysql
+      - MYSQL_USER=zipkin
+      - MYSQL_PASS=zipkin
+      - MYSQL_HOST=192.168.30.28
+      - MYSQL_JDBC_URL=jdbc:mysql://192.168.30.28:3154/zipkin?passwordCharacterEncoding=UTF-8&useGssapiServerConnection=false
+
+    ports:
+      - 3192:9411
+    depends_on:
+      - ecom-zipkin-storage
+
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=Aj189628@
+    ports:
+      - 3195:9200
+
+  fluentd:
+    build: ./fluentd
+    ports:
+      - 24224:24224
+      - 24224:24224/udp
+    links:
+      - "elasticsearch"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.2
+    ports:
+      - 3194:5601
+    links:
+      - "elasticsearch"
+
+  ecom-master-db-service:
+    image: timescale/timescaledb:latest-pg15
+    environment:
+      POSTGRES_PASSWORD: Aj189628@
+      POSTGRES_USER: janny
+    ports:
+      - 3155:5432
+    volumes:
+      - ecommerce-microservice_timescale_data:/var/lib/postgresql/data
+volumes: 
+  ecommerce-microservice_timescale_data:
+    external: true

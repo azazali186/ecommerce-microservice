@@ -13,7 +13,12 @@ import eurekaConfig from './config/eureka.js'
 import sequelize from "./config/sequelize.mjs"
 import Product from './models/product.mjs';
 
+import { zipkinMiddleware } from './config/zipkin.mjs';
+
+
 const app = express();
+
+app.use(zipkinMiddleware);
 
 import { inserData } from './utils/index.mjs';
 import Intraction from './models/intraction.mjs';

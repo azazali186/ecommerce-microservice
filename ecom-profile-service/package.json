@@ -21,6 +21,10 @@
     "jsonwebtoken": "latest",
     "mongoose": "latest",
     "nodemon": "^3.0.1",
-    "uuid": "latest"
+    "uuid": "latest",
+    "zipkin": "^0.22.0",
+    "zipkin-context-cls": "^0.22.0",
+    "zipkin-instrumentation-express": "^0.22.0",
+    "zipkin-transport-http": "^0.22.0"
   }
 }

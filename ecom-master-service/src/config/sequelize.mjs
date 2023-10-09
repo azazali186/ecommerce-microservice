@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 
-const sequelize = new Sequelize(process.env.DATABASE_URL || "postgres://janny:Aj189628@@192.168.30.28:5556/master-service", {
+const sequelize = new Sequelize(process.env.DATABASE_URL || "postgres://janny:Aj189628@@192.168.30.28:3155/master-service", {
   dialect: 'postgres' // or 'mysql', 'sqlite', 'mssql', etc.
 }); // Note: This method of accessing environment variables might vary based on your setup
 

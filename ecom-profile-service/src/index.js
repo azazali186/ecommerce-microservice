@@ -5,7 +5,12 @@ import express from 'express';
 import cors from 'cors';
 import expressListRoutes from 'express-list-routes';
 
+import { zipkinMiddleware } from './config/zipkin.mjs';
+
+
 const app = express();
+
+app.use(zipkinMiddleware);
 
 import { inserData } from './utils/index.mjs';
 
