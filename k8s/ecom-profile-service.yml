@@ -1,0 +1,81 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ecom-profile-service-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi # Adjust based on your needs
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ecom-profile-service-secrets
+type: Opaque
+data:
+  MONGODB_URI: bW9uZ29kYjovL2Vjb20tbW9uZ28tZGI6MjcwMTcvZWNvbS1wcm9maWxlLXNlcnZpY2U= # This is the base64 encoded string
+  JWT_SECRET: QWoxODk2MjhA # This is "Aj189628@" base64 encoded
+  PASS_SECRET: QWoxODk2MjhA # This is "Aj189628@" base64 encoded
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-profile-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-profile-service
+  template:
+    metadata:
+      labels:
+        app: ecom-profile-service
+    spec:
+      containers:
+      - name: ecom-profile-service-container
+        image: [YOUR_IMAGE_PATH] # Replace with the image path for your ecom-profile-service
+        env:
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: ecom-profile-service-secrets
+              key: MONGODB_URI
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: ecom-profile-service-secrets
+              key: JWT_SECRET
+        - name: PASS_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: ecom-profile-service-secrets
+              key: PASS_SECRET
+        - name: PORT
+          value: "3120"
+        ports:
+        - containerPort: 3120
+        volumeMounts:
+        - name: ecom-profile-service-volume
+          mountPath: /path/in/container
+      volumes:
+      - name: ecom-profile-service-volume
+        persistentVolumeClaim:
+          claimName: ecom-profile-service-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-profile-service
+spec:
+  selector:
+    app: ecom-profile-service
+  ports:
+  - protocol: TCP
+    port: 3120
+    targetPort: 3120

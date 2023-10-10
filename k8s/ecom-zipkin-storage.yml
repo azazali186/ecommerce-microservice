@@ -1,0 +1,35 @@
+# Deployment for ecom-zipkin-storage
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-zipkin-storage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-zipkin-storage
+  template:
+    metadata:
+      labels:
+        app: ecom-zipkin-storage
+    spec:
+      containers:
+      - name: zipkin-playground-mysql
+        image: openzipkin/zipkin-mysql
+        ports:
+        - containerPort: 3306
+
+---
+
+# Service for ecom-zipkin-storage
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-zipkin-storage
+spec:
+  selector:
+    app: ecom-zipkin-storage
+  ports:
+  - protocol: TCP
+    port: 3154
+    targetPort: 3306

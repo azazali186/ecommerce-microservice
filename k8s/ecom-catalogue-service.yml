@@ -1,0 +1,81 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ecom-catalogue-service-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi # Adjust based on your needs
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ecom-catalogue-service-secrets
+type: Opaque
+data:
+  DATABASE_URL: cG9zdGdyZXM6Ly9qYW5ueTpBajE4OTYyOEBAZWNvbS1tYXN0ZXItZGItc2VydmljZTo1NDMyL2Vjb20tY2F0YWxvZy1zZXJ2aWNl # This is base64 encoded string
+  JWT_SECRET: "Aj189628@"
+  PASS_SECRET: "Aj189628@"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-catalogue-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-catalogue-service
+  template:
+    metadata:
+      labels:
+        app: ecom-catalogue-service
+    spec:
+      containers:
+      - name: ecom-catalogue-service-container
+        image: [YOUR_IMAGE_PATH] # Replace with the image path for your ecom-catalogue-service
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ecom-catalogue-service-secrets
+              key: DATABASE_URL
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: ecom-catalogue-service-secrets
+              key: JWT_SECRET
+        - name: PASS_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: ecom-catalogue-service-secrets
+              key: PASS_SECRET
+        - name: PORT
+          value: "3110"
+        ports:
+        - containerPort: 3110
+        volumeMounts:
+        - name: ecom-catalogue-service-volume
+          mountPath: /path/in/container
+      volumes:
+      - name: ecom-catalogue-service-volume
+        persistentVolumeClaim:
+          claimName: ecom-catalogue-service-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-catalogue-service
+spec:
+  selector:
+    app: ecom-catalogue-service
+  ports:
+  - protocol: TCP
+    port: 3110
+    targetPort: 3110

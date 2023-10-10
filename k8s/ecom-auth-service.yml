@@ -1,0 +1,49 @@
+# Deployment for ecom-auth-service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-auth-service
+  template:
+    metadata:
+      labels:
+        app: ecom-auth-service
+    spec:
+      containers:
+      - name: ecom-auth-service-container
+        image: [YOUR_IMAGE_PATH] # Replace with the image path for your auth service
+        env:
+        - name: DATABASE_URL
+          value: postgres://janny:Aj189628@@ecom-master-db-service:5432/ecom-auth-service
+        - name: PORT
+          value: "3100"
+        # ... Add other environment variables as needed
+        ports:
+        - containerPort: 3100
+        volumeMounts:
+        - name: ecom-auth-service-volume
+          mountPath: /path/in/container
+
+volumes:
+- name: ecom-auth-service-volume
+  persistentVolumeClaim:
+    claimName: ecom-auth-service-pvc
+
+---
+
+# Service for ecom-auth-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-auth-service
+spec:
+  selector:
+    app: ecom-auth-service
+  ports:
+  - protocol: TCP
+    port: 3100
+    targetPort: 3100

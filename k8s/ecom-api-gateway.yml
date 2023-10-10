@@ -1,0 +1,41 @@
+# Deployment for ecom-api-gateway
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-api-gateway
+  template:
+    metadata:
+      labels:
+        app: ecom-api-gateway
+    spec:
+      containers:
+      - name: ecom-api-gateway-container
+        image: [YOUR_IMAGE_PATH] # Replace with the image path for your API gateway
+        ports:
+        - containerPort: 3099
+        volumeMounts:
+        - name: ecom-api-gateway-volume
+          mountPath: /app
+
+volumes:
+- name: ecom-api-gateway-volume
+  persistentVolumeClaim:
+    claimName: ecom-api-gateway-pvc
+
+---
+
+# Service for ecom-api-gateway
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-api-gateway
+spec:
+  selector:
+    app: ecom-api-gateway
+  ports:
+  - protocol: TCP

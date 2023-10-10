@@ -1,0 +1,99 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ecom-recom-service-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi # Adjust based on your needs
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ecom-recom-service-secrets
+type: Opaque
+stringData:
+  TENSORFLOW_DB_URL: mongodb://ecom-mongo-db:27017/ecom-recom-db
+  DATABASE_URL: postgres://janny:Aj189628@@ecom-master-db-service:3155/ecom-recom-service
+  ES_CLIENT_URL: http://elasticsearch:9200
+  JWT_SECRET: Aj189628@
+  PASS_SECRET: Aj189628@
+  TENSORFLOW_DB_NAME: ecom-recom-db
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-recom-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-recom-service
+  template:
+    metadata:
+      labels:
+        app: ecom-recom-service
+    spec:
+      containers:
+      - name: ecom-recom-service-container
+        image: [YOUR_IMAGE_PATH] # Replace with the image path for your ecom-recom-service
+        env:
+        - name: TENSORFLOW_DB_URL
+          valueFrom:
+            secretKeyRef:
+              name: ecom-recom-service-secrets
+              key: TENSORFLOW_DB_URL
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ecom-recom-service-secrets
+              key: DATABASE_URL
+        - name: ES_CLIENT_URL
+          valueFrom:
+            secretKeyRef:
+              name: ecom-recom-service-secrets
+              key: ES_CLIENT_URL
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: ecom-recom-service-secrets
+              key: JWT_SECRET
+        - name: PASS_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: ecom-recom-service-secrets
+              key: PASS_SECRET
+        - name: TENSORFLOW_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: ecom-recom-service-secrets
+              key: TENSORFLOW_DB_NAME
+        - name: PORT
+          value: "3199"
+        ports:
+        - containerPort: 3199
+        volumeMounts:
+        - name: ecom-recom-service-volume
+          mountPath: /path/in/container
+      volumes:
+      - name: ecom-recom-service-volume
+        persistentVolumeClaim:
+          claimName: ecom-recom-service-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-recom-service
+spec:
+  selector:
+    app: ecom-recom-service
+  ports:
+  - protocol: TCP
+    port: 3199
+    targetPort: 3199

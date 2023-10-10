@@ -29,7 +29,7 @@ spring:
         predicates:
         - Path=/api/recom-service/**
   config:
-    import: "optional:configserver:http://localhost:3088"
+    import: "optional:configserver:http://192.168.30.28:3088"
 
 logging:
   level:
@@ -37,6 +37,7 @@ logging:
     org.springframework.boot.actuate: DEBUG
 server:
   port: 3099
+  host: 192.168.30.28
 management:
   endpoints:
     web:
@@ -47,8 +48,8 @@ management:
       probability: 1.0
   zipkin:
     tracing:
-      endpoint: http://zipkin:9411/api/v2/spans
+      endpoint: http://192.168.30.28:3192/api/v2/spans
 eureka:
   client:
     service-url:
-      defaultZone: http://ecom-service-registry:3145/eureka/  # Eureka server location 
+      defaultZone: http://192.168.30.28:3145/eureka/  # Eureka server location 

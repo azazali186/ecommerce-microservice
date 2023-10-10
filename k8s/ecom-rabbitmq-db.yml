@@ -1,0 +1,77 @@
+# Deployment for ecom-rabbitmq-db
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-rabbitmq-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-rabbitmq-db
+  template:
+    metadata:
+      labels:
+        app: ecom-rabbitmq-db
+    spec:
+      containers:
+      - name: ecom-rabbitmq-container
+        image: rabbitmq:management
+        ports:
+        - containerPort: 15672
+        - containerPort: 5672
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          value: "admin"
+        - name: RABBITMQ_DEFAULT_PASS
+          value: "admin"
+        volumeMounts:
+        - mountPath: /var/lib/rabbitmq
+          name: ecom-microservice-rabbitmq-data
+
+---
+
+# Service for ecom-rabbitmq-db
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-rabbitmq-db
+spec:
+  selector:
+    app: ecom-rabbitmq-db
+  ports:
+  - protocol: TCP
+    port: 31567
+    targetPort: 15672
+  - protocol: TCP
+    port: 3156
+    targetPort: 5672
+
+---
+
+# PersistentVolume and PersistentVolumeClaim for RabbitMQ
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ecom-microservice-rabbitmq-data
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ecom-microservice-rabbitmq-data
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

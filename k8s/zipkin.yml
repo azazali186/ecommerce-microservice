@@ -1,0 +1,48 @@
+# Deployment for zipkin
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zipkin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zipkin
+  template:
+    metadata:
+      labels:
+        app: zipkin
+    spec:
+      containers:
+      - name: zipkin-playground-zipkin
+        image: openzipkin/zipkin
+        ports:
+        - containerPort: 9411
+        env:
+        - name: STORAGE_TYPE
+          value: "mysql"
+        - name: MYSQL_USER
+          value: "zipkin"
+        - name: MYSQL_PASS
+          value: "zipkin"
+        - name: MYSQL_HOST
+          value: "ecom-zipkin-storage"
+        - name: MYSQL_JDBC_URL
+          value: "jdbc:mysql://ecom-zipkin-storage:3306/zipkin?passwordCharacterEncoding=UTF-8&useGssapiServerConnection=false"
+      volumes:
+      # Add any necessary volumes here
+
+---
+
+# Service for zipkin
+apiVersion: v1
+kind: Service
+metadata:
+  name: zipkin
+spec:
+  selector:
+    app: zipkin
+  ports:
+  - protocol: TCP
+    port: 3192
+    targetPort: 9411

@@ -1,0 +1,43 @@
+# Deployment for ecom-service-registry
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-service-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-service-registry
+  template:
+    metadata:
+      labels:
+        app: ecom-service-registry
+    spec:
+      containers:
+      - name: ecom-service-registry-container
+        image: [YOUR_IMAGE_PATH] # Replace with the image path for your service registry
+        ports:
+        - containerPort: 3145
+        volumeMounts:
+        - name: ecom-service-registry-volume
+          mountPath: /app
+
+volumes:
+- name: ecom-service-registry-volume
+  persistentVolumeClaim:
+    claimName: ecom-service-registry-pvc
+
+---
+
+# Service for ecom-service-registry
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-service-registry
+spec:
+  selector:
+    app: ecom-service-registry
+  ports:
+  - protocol: TCP
+    port: 3145
+    targetPort: 3145

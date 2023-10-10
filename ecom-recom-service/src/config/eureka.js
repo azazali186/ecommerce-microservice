@@ -1,13 +1,13 @@
 export default {
   instance: {
-    instanceId: `${process.env.HOST || '192.168.30.28'}:ecom-recom-service:${process.env.PORT || 5199}`,
+    instanceId: `${process.env.HOST || 'ecom-recom-service'}:ecom-recom-service:${process.env.PORT || 3199}`,
     app: 'ECOM-RECOM-SERVICE',
-    hostName: process.env.HOST || '192.168.30.28',
-    ipAddr: process.env.HOST || '192.168.30.28',
-    statusPageUrl: `http://${process.env.HOST || '192.168.30.28'}:${process.env.PORT || 5199}/info`,
-    healthCheckUrl: `http://${process.env.HOST || '192.168.30.28'}:${process.env.PORT || 5199}/health`,
+    hostName: process.env.HOST || 'ecom-recom-service',
+    ipAddr: process.env.HOST || 'ecom-recom-service',
+    statusPageUrl: `http://${process.env.HOST || 'ecom-recom-service'}:${process.env.PORT || 3199}/info`,
+    healthCheckUrl: `http://${process.env.HOST || 'ecom-recom-service'}:${process.env.PORT || 3199}/health`,
     port: {
-      '$': process.env.PORT || 5199,
+      '$': process.env.PORT || 3199,
       '@enabled': 'true',
     },
     vipAddress: 'ecom-recom-service',
@@ -17,7 +17,7 @@ export default {
     },
   },
   eureka: {
-    host: process.env.EUREKA_HOST || 'localhost',
+    host: process.env.EUREKA_HOST || '192.168.30.28',
     port: process.env.EUREKA_PORT || 3145,
     servicePath: '/eureka/apps/'
   },

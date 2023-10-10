@@ -1,0 +1,35 @@
+# Deployment for Grafana
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-grafana
+  template:
+    metadata:
+      labels:
+        app: ecom-grafana
+    spec:
+      containers:
+      - name: ecom-grafana
+        image: grafana/grafana:latest
+        ports:
+        - containerPort: 3000
+
+---
+
+# Service for Grafana
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-grafana
+spec:
+  selector:
+    app: ecom-grafana
+  ports:
+  - protocol: TCP
+    port: 3197
+    targetPort: 3000

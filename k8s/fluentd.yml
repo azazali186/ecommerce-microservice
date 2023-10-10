@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: fluentd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fluentd
+  template:
+    metadata:
+      labels:
+        app: fluentd
+    spec:
+      containers:
+      - name: fluentd
+        image: [YOUR_FLUENTD_IMAGE_PATH] # Replace this with the appropriate image path
+        ports:
+        - containerPort: 24224
+        - containerPort: 24224
+          protocol: UDP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluentd
+spec:
+  selector:
+    app: fluentd
+  ports:
+  - name: fluentd-tcp
+    protocol: TCP
+    port: 24224
+    targetPort: 24224
+  - name: fluentd-udp
+    protocol: UDP
+    port: 24224
+    targetPort: 24224

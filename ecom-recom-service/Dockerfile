@@ -5,7 +5,7 @@ FROM node:20
 WORKDIR /app
 
 # Copy the package.json and package-lock.json files to the container
-COPY package*.json ./
+COPY ./package*.json .
 
 # Install dependencies in the container
 RUN npm install
@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Make port 5100 available to the world outside this container
-EXPOSE 5100
+EXPOSE 3199
 
 # Run the application when the container launches
 CMD ["npm", "start"]

@@ -1,0 +1,68 @@
+# Deployment for ecom-mongo-db
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-mongo-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-mongo-db
+  template:
+    metadata:
+      labels:
+        app: ecom-mongo-db
+    spec:
+      containers:
+      - name: ecom-mongo-container
+        image: mongo:latest
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - mountPath: /data/db
+          name: mongodata
+
+---
+
+# Service for ecom-mongo-db
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-mongo-db
+spec:
+  selector:
+    app: ecom-mongo-db
+  ports:
+  - protocol: TCP
+    port: 3153
+    targetPort: 27017
+
+---
+
+# PersistentVolume and PersistentVolumeClaim for MongoDB
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongodata
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/mongodata"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodata
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

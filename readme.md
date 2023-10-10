@@ -23,3 +23,13 @@
 |------:|-----------------------|-------|------------------------|-------|-------------------------|
 | 1     | ecom-recom-train      | 2     | ecom-profile-service   | 3     | ecom-file-service       |
 | 4     | ecom-catelogue-service|       |                        |       |                         |
+
+
+
+### create docker images using below command
+
+docker-compose -f docker-compose.build.yml build  --no-cache
+
+### for running the contailers
+
+docker-compose -f docker-compose.up.yml up -d
