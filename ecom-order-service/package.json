@@ -1,0 +1,30 @@
+{
+  "name": "catalogue-service",
+  "version": "1.0.0",
+  "description": "This is the catalogue service for ecommerce microservice project",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --legacy-watch src/index.js"
+  },
+  "author": "Ali Azaz M",
+  "license": "MIT",
+  "dependencies": {
+    "amqplib": "latest",
+    "cors": "latest",
+    "crypto-js": "latest",
+    "dotenv": "latest",
+    "eureka-js-client": "latest",
+    "express": "latest",
+    "express-list-routes": "latest",
+    "jsonwebtoken": "latest",
+    "mongoose": "latest",
+    "nodemon": "latest",
+    "uuid": "latest",
+    "zipkin": "^0.22.0",
+    "zipkin-context-cls": "^0.22.0",
+    "zipkin-instrumentation-express": "^0.22.0",
+    "zipkin-transport-http": "^0.22.0"
+  }
+}

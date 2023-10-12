@@ -111,7 +111,7 @@ productsRoutes.post("/", verifyTokenAndAuthorization, async (req, res) => {
       const product = new Product(req.body);
       if (req.body.stocks) {
         const stocks = await Stocks.insertMany(req.body.stocks);
-        product.stocks = stocks.map((stock) => stock._id);
+        product.stock = stocks.map((stock) => stock._id);
       }
       if (req.body.categories) {
         const categories = await Category.insertMany(req.body.categories);
