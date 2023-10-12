@@ -8,22 +8,28 @@ const orderSchema = new Schema({
     type: String,
     default: () => uuidv4().replace(/-/g, ""),
   },
-  items: [{
-    type: Schema.Types.String,
-    ref: 'orderItem'
-  }],
+  items: [
+    {
+      type: String,
+      ref: "orderItem",
+    },
+  ],
   status: {
-    type: Schema.Types.String,
+    type: String,
     required: false,
     default: "PENDING",
   },
   quantity: {
-    type: Schema.Types.String,
+    type: String,
     required: false,
   },
   price: {
-    type: Schema.Types.String,
+    type: String,
     required: false,
+  },
+  userId: {
+    type: String,
+    required: true,
   },
   createdAt: {
     type: Date,

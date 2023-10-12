@@ -15,7 +15,11 @@ const cartSchema = new Schema({
   status: {
     type: Schema.Types.String,
     required: false,
-    default: "PENDING",
+    default: "ACTIVE",
+  },
+  userId: {
+    type: String,
+    required: true,
   },
   createdAt: {
     type: Date,

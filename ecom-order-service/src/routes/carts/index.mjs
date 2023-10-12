@@ -4,10 +4,10 @@ import {
 import Catalog from "../../models/catalog.mjs";
 
 import express from 'express';
-const catalogsRoutes = express.Router()
+const cartsRoutes = express.Router()
 
 // Update Catalog
-catalogsRoutes.patch("/:id", verifyTokenAndAuthorization, async (req, res) => {
+cartsRoutes.patch("/:id", verifyTokenAndAuthorization, async (req, res) => {
     try {
         const updatedCatalog = await Catalog.update(
             req.body,
@@ -31,7 +31,7 @@ catalogsRoutes.patch("/:id", verifyTokenAndAuthorization, async (req, res) => {
 });
 
 // Delete Catalog
-catalogsRoutes.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
+cartsRoutes.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
     try {
         const deletedCount = await Catalog.destroy({
             where: { id: req.params.id },
@@ -49,7 +49,7 @@ catalogsRoutes.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
 });
 
 // Get Catalog by ID
-catalogsRoutes.get("/:id", verifyTokenAndAuthorization, async (req, res) => {
+cartsRoutes.get("/:id", verifyTokenAndAuthorization, async (req, res) => {
     try {
         const getCatalog = await Catalog.findById(req.params.id);
 
@@ -67,7 +67,7 @@ catalogsRoutes.get("/:id", verifyTokenAndAuthorization, async (req, res) => {
 });
 
 // Get All Catalogs
-catalogsRoutes.get("/", verifyTokenAndAuthorization,paginate(Catalog), async (req, res) => {
+cartsRoutes.get("/", verifyTokenAndAuthorization,paginate(Catalog), async (req, res) => {
     const { new: isNew } = req.query;
 
     try {
@@ -79,7 +79,7 @@ catalogsRoutes.get("/", verifyTokenAndAuthorization,paginate(Catalog), async (re
 });
 
 // Create Catalog
-catalogsRoutes.post('/', verifyTokenAndAuthorization, async (req, res) => {
+cartsRoutes.post('/', verifyTokenAndAuthorization, async (req, res) => {
     try {
         let existingCatalog = await Catalog.findOne({
             where: {code: req.body.code.toUpperCase() }
@@ -112,4 +112,4 @@ catalogsRoutes.post('/', verifyTokenAndAuthorization, async (req, res) => {
 });
 
 
-export default catalogsRoutes;
+export default cartsRoutes;
