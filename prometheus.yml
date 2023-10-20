@@ -2,7 +2,10 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: 'ecom-api-gateway'
+  - job_name: 'ecom-service-registry'
     metrics_path: '/actuator/prometheus'
-    static_configs:
-    - targets: ['192.168.30.28:3099']
+    eureka_sd_configs: 
+      - server: 'http://192.168.30.28:3145/eureka/'
+    # static_configs:
+    # - targets: ['192.168.30.28:3099']
+    
