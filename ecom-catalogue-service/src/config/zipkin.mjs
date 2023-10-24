@@ -18,4 +18,4 @@ const recorder = new BatchRecorder({
 
 const tracer = new Tracer({ ctxImpl, recorder, localServiceName });
 
-export const zipkinMiddleware = expressMiddleware({ tracer, port: process.env.PORT || 3100 })
+export const zipkinMiddleware = expressMiddleware({ tracer, port: process.env.PORT || 3130 })

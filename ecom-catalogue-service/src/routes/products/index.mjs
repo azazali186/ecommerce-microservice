@@ -8,6 +8,8 @@ import { paginate } from "../../utils/index.mjs";
 import { sendProductForES } from "../../rabbitMq/sendProductForES.mjs";
 import Translation from "../../models/translation.mjs";
 import ProductMetaData from "../../models/productMetaData.mjs";
+import ProductPrices from "../../models/productPrice.mjs";
+import Variations from "../../models/variations.mjs";
 const productsRoutes = express.Router();
 
 // Update Product
@@ -65,7 +67,7 @@ productsRoutes.get("/:id", async (req, res) => {
         productId: product.id,
         name: translation.name,
         description: translation.description,
-        intraction: "views", 
+        intraction: "views",
         userId: req.user.id,
       };
 
@@ -110,19 +112,55 @@ productsRoutes.get(
 productsRoutes.post("/", verifyTokenAndAuthorization, async (req, res) => {
   try {
     try {
-      const product = new Product(req.body);
+      const product = new Product(req.body).save();
       if (req.body.stocks) {
-        req.body.stocks.map((s) => {
+        const stocks = [];
+        req.body.stocks.map(async (s) => {
           s.productId = product._id;
-          return s
-        })
-        const stocks = await Stocks.insertMany();
-        product.stock = stocks.map((stock) => stock._id);
+          const stock = new Stocks(s).save();
+          if (s.translations) {
+            const translations = await Translation.insertMany(s.translations);
+            stock.translation = translations.map(
+              (translations) => translations._id
+            );
+          }
+          if (s.prices) {
+            s.prices.map((sp) => {
+              sp.stockId = stock._id;
+            });
+            const prices = await ProductPrices.insertMany(s.prices);
+            stock.price = prices.map((sp) => sp._id);
+          }
+          if (s.variation) {
+            const variations = [];
+
+            s.variation.map((dv) => {
+              const vName = dv.name;
+              const vVal = dv.value;
+              vVal.map(async (v) => {
+                const vd = await Variations({
+                  name: vName,
+                  value: v,
+                }).save();
+                variations.push(vd._id);
+              });
+            });
+
+            stock.variations = variations;
+          }
+          await stock.save();
+          stock.push(stock._id);
+          return stock;
+        });
+        product.stock = stocks;
       }
       if (req.body.translations) {
-
-        const translations = await Translation.insertMany(req.body.translations);
-        product.translation = translations.map((translations) => translations._id);
+        const translations = await Translation.insertMany(
+          req.body.translations
+        );
+        product.translation = translations.map(
+          (translations) => translations._id
+        );
       }
       if (req.body.category) {
         const category = await Category.insertMany(req.body.category);
@@ -131,8 +169,8 @@ productsRoutes.post("/", verifyTokenAndAuthorization, async (req, res) => {
       if (req.body.metas) {
         req.body.metas.map((m) => {
           m.productId = product._id;
-          return m
-        })
+          return m;
+        });
         const metas = await ProductMetaData.insertMany(req.body.metas);
         product.meta = metas.map((meta) => meta._id);
       }

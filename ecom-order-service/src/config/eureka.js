@@ -1,13 +1,13 @@
 export default {
   instance: {
-    instanceId: `${process.env.HOST || 'ecom-order-service'}:ecom-order-service:${process.env.PORT || 3130}`,
+    instanceId: `${process.env.HOST || 'ecom-order-service'}:ecom-order-service:${process.env.PORT || 3140}`,
     app: 'ECOM-ORDER-SERVICE',
     hostName: process.env.HOST || 'ecom-order-service',
     ipAddr: process.env.HOST || 'ecom-order-service',
-    statusPageUrl: `http://${process.env.HOST || 'ecom-order-service'}:${process.env.PORT || 3130}/info`,
-    healthCheckUrl: `http://${process.env.HOST || 'ecom-order-service'}:${process.env.PORT || 3130}/health`,
+    statusPageUrl: `http://${process.env.HOST || 'ecom-order-service'}:${process.env.PORT || 3140}/info`,
+    healthCheckUrl: `http://${process.env.HOST || 'ecom-order-service'}:${process.env.PORT || 3140}/health`,
     port: {
-      '$': process.env.PORT || 3130,
+      '$': process.env.PORT || 3140,
       '@enabled': 'true',
     },
     vipAddress: 'ecom-order-service',
