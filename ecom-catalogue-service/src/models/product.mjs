@@ -1,5 +1,9 @@
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+import Translation from './translation.mjs';
+import Stock from './stocks.mjs';
+import Category from './category.mjs';
+import ProductMetaData from './productMetaData.mjs';
 
 const { Schema } = mongoose;
 
@@ -15,13 +19,13 @@ const productSchema = new Schema({
   translation: [
     {
       type: Schema.Types.String,
-      ref: "translations",
+      ref: "translations"
     },
   ],
   sku:{
     type: String,
-    default: "",
-    required: true
+    required: true,
+    unique: true
   },
   quantity: [
     {
@@ -31,15 +35,15 @@ const productSchema = new Schema({
   ],
   stock: [{
     type: Schema.Types.String,
-    ref: 'stocks'
+    ref: "stocks"
   }],
   categories: [{
     type: Schema.Types.String,
-    ref: 'category'
+    ref: Category
   }],
   meta: [{
     type: Schema.Types.String,
-    ref: 'productMetaData'
+    ref: "productMetaDatas"
   }],
   isActive: {
     type: Boolean,
@@ -59,6 +63,6 @@ productSchema.pre('save', function(next) {
   next();
 });
 
-const Product = mongoose.model('product', productSchema);
+const Product = mongoose.model('products', productSchema);
 
 export default Product;

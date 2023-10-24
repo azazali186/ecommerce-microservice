@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
+import Product from "./product.mjs";
 
 const { Schema } = mongoose;
 
@@ -10,7 +11,7 @@ const productMetaDataSchema = new Schema({
   },
   productId: {
     type: Schema.Types.String,
-    ref: 'product'
+    ref: "products"
   },
   languageCode: {
     type: String,
@@ -36,6 +37,6 @@ productMetaDataSchema.pre("save", function (next) {
   next();
 });
 
-const ProductMetaData = mongoose.model("productMetaData", productMetaDataSchema);
+const ProductMetaData = mongoose.model("productMetaDatas", productMetaDataSchema);
 
 export default ProductMetaData;

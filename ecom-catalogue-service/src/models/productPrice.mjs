@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
+import Stock from "./stocks.mjs";
 
 const { Schema } = mongoose;
 
@@ -10,7 +11,7 @@ const ppSchema = new Schema({
   },
   stockId: {
     type: Schema.Types.String,
-    ref: 'stocks'
+    ref: "stocks"
   },
   currencyCode: {
     type: String,
@@ -27,6 +28,6 @@ ppSchema.pre("save", function (next) {
   next();
 });
 
-const ProductPrices = mongoose.model("productPrice", ppSchema);
+const ProductPrice = mongoose.model("productPrices", ppSchema);
 
-export default ProductPrices;
+export default ProductPrice;

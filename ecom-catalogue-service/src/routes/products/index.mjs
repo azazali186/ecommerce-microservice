@@ -2,14 +2,14 @@ import { verifyTokenAndAuthorization } from "../../middleware/verifyToken.mjs";
 import Product from "../../models/product.mjs";
 
 import express from "express";
-import Stocks from "../../models/stocks.mjs";
+import Stock from "../../models/stocks.mjs";
 import Category from "../../models/category.mjs";
 import { paginate } from "../../utils/index.mjs";
 import { sendProductForES } from "../../rabbitMq/sendProductForES.mjs";
 import Translation from "../../models/translation.mjs";
 import ProductMetaData from "../../models/productMetaData.mjs";
-import ProductPrices from "../../models/productPrice.mjs";
-import Variations from "../../models/variations.mjs";
+import ProductPrice from "../../models/productPrice.mjs";
+import Variations from "../../models/variation.mjs";
 const productsRoutes = express.Router();
 
 // Update Product
@@ -42,7 +42,7 @@ productsRoutes.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).send("Product not found");
     // Clean up related data if necessary
-    await Stocks.deleteMany({ _id: { $in: product.stocks } });
+    await Stock.deleteMany({ _id: { $in: product.stocks } });
     await Category.deleteMany({ _id: { $in: product.categories } });
     await product.remove();
     res.status(200).send({ message: "Product deleted" });
@@ -55,8 +55,8 @@ productsRoutes.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
 productsRoutes.get("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id)
-      .populate("stocks")
-      .populate("categories");
+      .populate("Stock")
+      .populate("Category");
 
     if (!product) return res.status(404).send("Product not found");
 
@@ -97,8 +97,33 @@ const createQueryFilter = (req) => {
 // Usage in your route
 productsRoutes.get(
   "/",
-  paginate(Product, ["stocks", "translations", "categories"]),
-  (req, res) => {
+  paginate(Product, [
+    {
+      path: "translation",
+      select: "name languageCode description",
+    },
+    {
+      path: "categories",
+      select: "name isActive",
+    },
+    {
+      path: "meta",
+      select: "languageCode title keyword description",
+    },
+    {
+      path: "stock",
+      populate: [
+        {
+          path: "translation",
+          model: "translations",
+          select: "name languageCode description",
+        },
+        { path: "variations", model: "variations", select: "name value" },
+        { path: "price", model: "productPrices", select: "currencyCode price" },
+      ],
+    },
+  ]),
+  async (req, res) => {
     try {
       req.query.filter = createQueryFilter(req);
       res.status(200).send(req.paginatedResults);
@@ -109,80 +134,100 @@ productsRoutes.get(
 );
 
 // Create Product
+
 productsRoutes.post("/", verifyTokenAndAuthorization, async (req, res) => {
   try {
-    try {
-      const product = new Product(req.body).save();
-      if (req.body.stocks) {
-        const stocks = [];
+    const product = new Product(req.body);
+
+    if (req.body.stocks) {
+      const stockIds = await Promise.all(
         req.body.stocks.map(async (s) => {
           s.productId = product._id;
-          const stock = new Stocks(s).save();
+          const stock = new Stock(s);
+
           if (s.translations) {
             const translations = await Translation.insertMany(s.translations);
-            stock.translation = translations.map(
-              (translations) => translations._id
-            );
+            stock.translation = translations.map((t) => t._id);
           }
+
           if (s.prices) {
-            s.prices.map((sp) => {
+            s.prices.forEach((sp) => {
               sp.stockId = stock._id;
             });
-            const prices = await ProductPrices.insertMany(s.prices);
+            const prices = await ProductPrice.insertMany(s.prices);
             stock.price = prices.map((sp) => sp._id);
           }
+
           if (s.variation) {
-            const variations = [];
+            const variationIds = await Promise.all(
+              s.variation.map(async (dv) => {
+                const vName = dv.name;
 
-            s.variation.map((dv) => {
-              const vName = dv.name;
-              const vVal = dv.value;
-              vVal.map(async (v) => {
-                const vd = await Variations({
-                  name: vName,
-                  value: v,
-                }).save();
-                variations.push(vd._id);
-              });
-            });
-
-            stock.variations = variations;
+                return Promise.all(
+                  dv.value.map(async (v) => {
+                    let existingVariation = await Variations.findOne({
+                      name: vName,
+                      value: v,
+                    });
+                    if (!existingVariation) {
+                      existingVariation = await new Variations({
+                        name: vName,
+                        value: v,
+                      }).save();
+                    }
+                    return existingVariation._id;
+                  })
+                );
+              })
+            );
+            stock.variations = variationIds.flat();
           }
-          await stock.save();
-          stock.push(stock._id);
-          return stock;
-        });
-        product.stock = stocks;
-      }
-      if (req.body.translations) {
-        const translations = await Translation.insertMany(
-          req.body.translations
-        );
-        product.translation = translations.map(
-          (translations) => translations._id
-        );
-      }
-      if (req.body.category) {
-        const category = await Category.insertMany(req.body.category);
-        product.categories = category.map((cat) => cat._id);
-      }
-      if (req.body.metas) {
-        req.body.metas.map((m) => {
-          m.productId = product._id;
-          return m;
-        });
-        const metas = await ProductMetaData.insertMany(req.body.metas);
-        product.meta = metas.map((meta) => meta._id);
-      }
-      await product.save();
 
-      res.status(201).send(product);
-    } catch (error) {
-      res.status(500).send(error.message);
+          await stock.save();
+          return stock._id;
+        })
+      );
+
+      product.stock = stockIds;
     }
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Internal server error" });
+
+    if (req.body.translations) {
+      const translations = await Translation.insertMany(req.body.translations);
+      product.translation = translations.map((t) => t._id);
+    }
+
+    if (req.body.category) {
+      const categoryIds = [];
+
+      for (let cat of req.body.category) {
+        let existingCategory = await Category.findOne({ name: cat.name }); // assuming you're searching by a 'name' field
+
+        if (!existingCategory) {
+          existingCategory = await new Category(cat).save();
+        }
+
+        categoryIds.push(existingCategory._id);
+      }
+
+      product.categories = categoryIds;
+    }
+
+    if (req.body.metas) {
+      req.body.metas.forEach((m) => {
+        m.productId = product._id;
+      });
+      const metas = await ProductMetaData.insertMany(req.body.metas);
+      product.meta = metas.map((meta) => meta._id);
+    }
+
+    await product.save();
+
+    res.status(201).send(product);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 });
 

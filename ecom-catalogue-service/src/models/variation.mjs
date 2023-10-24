@@ -8,10 +8,6 @@ const variationSchema = new Schema({
     type: String,
     default: () => uuidv4().replace(/-/g, ""),
   },
-  stockId: {
-    type: Schema.Types.String,
-    ref: 'stocks'
-  },
   name: {
     type: String,
     required: true,
@@ -27,6 +23,6 @@ variationSchema.pre("save", function (next) {
   next();
 });
 
-const Variations = mongoose.model("variations", variationSchema);
+const Variation = mongoose.model("variations", variationSchema);
 
-export default Variations;
+export default Variation;

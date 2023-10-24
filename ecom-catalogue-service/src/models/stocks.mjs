@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
+import Product from "./product.mjs";
+import Translation from "./translation.mjs";
+import Variations from "./variation.mjs";
+import ProductPrices from "./productPrice.mjs";
 
 const { Schema } = mongoose;
 
@@ -10,12 +14,12 @@ const stocksSchema = new Schema({
   },
   productId: {
     type: Schema.Types.String,
-    ref: "product",
+    ref: "products"
   },
   translation: [
     {
       type: Schema.Types.String,
-      ref: "translations",
+      ref: "translations"
     },
   ],
   sku: {
@@ -37,13 +41,13 @@ const stocksSchema = new Schema({
   variations: [
     {
       type: Schema.Types.String,
-      ref: "variations",
+      ref: "variations"
     },
   ],
   price: [
     {
       type: Schema.Types.String,
-      ref: "productPrice",
+      ref: "productPrices"
     },
   ],
   createdAt: {
