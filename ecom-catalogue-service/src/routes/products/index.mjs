@@ -1,4 +1,4 @@
-import { verifyTokenAndAuthorization } from "../../middleware/verifyToken.mjs";
+import { tokenExist, verifyTokenAndAuthorization } from "../../middleware/verifyToken.mjs";
 import Product from "../../models/product.mjs";
 
 import express from "express";
@@ -52,11 +52,39 @@ productsRoutes.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
 });
 
 // Get Product by ID
-productsRoutes.get("/:id", async (req, res) => {
+productsRoutes.get("/:id", tokenExist , async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id)
-      .populate("Stock")
-      .populate("Category");
+    const product = await Product.findOne({
+      id: req.query.id
+    })
+      .populate([
+        {
+          path: "translation",
+          select: "name languageCode description",
+        },
+        {
+          path: "categories",
+          select: "name isActive",
+        },
+        {
+          path: "meta",
+          select: "languageCode title keyword description",
+        },
+        {
+          path: "stock",
+          populate: [
+            {
+              path: "translation",
+              model: "translations",
+              select: "name languageCode description",
+            },
+            { path: "variations", model: "variations", select: "name value" },
+            { path: "price", model: "productPrices", select: "currencyCode price" },
+          ],
+        },
+      ])
+
+      console.log("product ", product)
 
     if (!product) return res.status(404).send("Product not found");
 
@@ -64,11 +92,11 @@ productsRoutes.get("/:id", async (req, res) => {
       const translation = product.translation[0];
 
       const productData = {
-        productId: product.id,
+        productId: product._id,
         name: translation.name,
         description: translation.description,
         intraction: "views",
-        userId: req.user.id,
+        userId: req?.user?.id || "guest",
       };
 
       await sendProductForES(productData);

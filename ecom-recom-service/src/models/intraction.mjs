@@ -37,6 +37,13 @@ Intraction.init(
       type: DataTypes.STRING,
       required: true,
     },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+    },
   },
   {
     sequelize,

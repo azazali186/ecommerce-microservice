@@ -19,10 +19,9 @@ import { zipkinMiddleware } from './config/zipkin.mjs';
 const app = express();
 
 app.use(zipkinMiddleware);
-
+mongoConnect();
 import { inserData } from './utils/index.mjs';
 import Intraction from './models/intraction.mjs';
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -58,6 +57,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions)); */
 import productsRoutes from './routes/products/index.mjs'
+import { mongoConnect } from './config/db.js';
 
 app.use("/api/recommendation-service/products", productsRoutes);
 await inserData(expressListRoutes, app);

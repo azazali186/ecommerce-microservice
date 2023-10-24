@@ -20,6 +20,13 @@ Product.init(
     description: {
       type: DataTypes.TEXT,
     },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+    },
   },
   {
     sequelize,

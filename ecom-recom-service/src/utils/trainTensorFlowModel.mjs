@@ -8,7 +8,7 @@ import { Op } from "sequelize";
 import { requestProducts } from "../rabbitMq/requestProducts.mjs";
 
 export const WEIGHTS = {
-  view: 1,
+  views: 1,
   like: 2,
   add_to_cart: 3,
   add_to_wishlist: 4,
@@ -16,10 +16,16 @@ export const WEIGHTS = {
 };
 
 const saveEmbeddingsToMongo = async (embeddings, collectionName) => {
-  const modelJSON = embeddings.toJSON();
+  // Convert tf.Tensor to a JavaScript array
+  const embeddingsArray = embeddings.arraySync();
+  if (!db) {
+    console.error("Database not initialized");
+    return;
+  }
   const collection = db.collection(collectionName);
-  await collection.insertOne(modelJSON);
+  await collection.insertOne({ data: embeddingsArray });
 };
+
 
 export const getIntractionValue = (intraction) => {
   return WEIGHTS[intraction] || 0;
@@ -118,9 +124,11 @@ export const trainTensorFlowModel = async () => {
 
   const numUsers = users.length;
   const numProducts = products.length;
+  const numIntraction = intractions.length;
 
   const userIDs = users.map((user) => user.id);
   const productIDs = products.map((product) => product.id);
+  const intractionIDs = intractions.map((intraction) => intraction.id);
 
   // Create a 2D tensor for user-product intractions, initialized with zeros
   const intractionMatrix = tf.tensor2d(
@@ -147,23 +155,18 @@ export const trainTensorFlowModel = async () => {
   );
 
   const optimizer = tf.train.sgd(0.1);
-
   for (let epoch = 0; epoch < 1000; epoch++) {
+
     optimizer.minimize(() => {
-      const predictedIntractions = tf.matMul(
-        userEmbeddings,
-        productEmbeddings,
-        true,
-        false
-      );
+      const predictedInteraction = tf.dot(userEmbeddings, productEmbeddings.transpose());
+
       const loss = tf.losses.meanSquaredError(
         intractionMatrix,
-        predictedIntractions
+        predictedInteraction
       );
       return loss;
     });
   }
-
   await saveEmbeddingsToMongo(userEmbeddings, "userEmbeddings");
   await saveEmbeddingsToMongo(productEmbeddings, "productEmbeddings");
 };

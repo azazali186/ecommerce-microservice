@@ -16,7 +16,14 @@ User.init(
     },
     username: {
       type: DataTypes.STRING,
-    }
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+    },
   },
   {
     sequelize,
