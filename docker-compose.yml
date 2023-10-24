@@ -152,7 +152,7 @@ services:
       dockerfile: './Dockerfile'
     environment:
       DATABASE_URL: postgres://janny:Aj189628@@ecom-master-db-service:5432/ecom-catalog-service
-      PORT: 3110
+      PORT: 3130
       JWT_SECRET: Aj189628@
       PASS_SECRET: Aj189628@
     depends_on:

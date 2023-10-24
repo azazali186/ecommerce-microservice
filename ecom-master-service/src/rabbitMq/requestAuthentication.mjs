@@ -1,7 +1,7 @@
 import { connect } from 'amqplib';
 
 export const requestAuthentication = async (userData) => {
-    const connection = await connect('amqp://localhost');
+    const connection = await connect(process.env.RABBIT_MQ_URL || "amqp://localhost");
     const channel = await connection.createChannel();
 
     const queue = await channel.assertQueue('', { exclusive: true });
