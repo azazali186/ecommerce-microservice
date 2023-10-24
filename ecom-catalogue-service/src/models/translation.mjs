@@ -29,6 +29,6 @@ translationSchema.pre("save", function (next) {
   next();
 });
 
-const ProductPrices = mongoose.model("translations", translationSchema);
+const Translation = mongoose.model("translations", translationSchema);
 
-export default ProductPrices;
+export default Translation;

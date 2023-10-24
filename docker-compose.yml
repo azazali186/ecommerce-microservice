@@ -41,50 +41,50 @@ services:
       - ecommerce-microservice_timescale_data:/var/lib/postgresql/data
 
 # Prometheus configuration
-  prometheus:
-    image: prom/prometheus
-    container_name: ecom-prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    ports:
-      - 3198:9090
-  grafana:
-    image: grafana/grafana
-    container_name: ecom-grafana
-    ports:
-      - 3197:3000
-# Zipkin configuration
+#   prometheus:
+#     image: prom/prometheus
+#     container_name: ecom-prometheus
+#     volumes:
+#       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+#     command:
+#       - '--config.file=/etc/prometheus/prometheus.yml'
+#     ports:
+#       - 3198:9090
+#   grafana:
+#     image: grafana/grafana
+#     container_name: ecom-grafana
+#     ports:
+#       - 3197:3000
+# # Zipkin configuration
   
-  zipkin:
-    image: openzipkin/zipkin
-    container_name: zipkin-playground-zipkin
-    environment:
-      - STORAGE_TYPE=mysql
-      - MYSQL_USER=zipkin
-      - MYSQL_PASS=zipkin
-      - MYSQL_HOST=ecom-zipkin-storage
-      - MYSQL_JDBC_URL=jdbc:mysql://ecom-zipkin-storage:3306/zipkin?passwordCharacterEncoding=UTF-8&useGssapiServerConnection=false
-    ports:
-      - 3192:9411
-    depends_on:
-      - ecom-zipkin-storage
- # ELK configuration
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
-    environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-      - ELASTIC_USERNAME=elastic
-      - ELASTIC_PASSWORD=Aj189628@
+#   zipkin:
+#     image: openzipkin/zipkin
+#     container_name: zipkin-playground-zipkin
+#     environment:
+#       - STORAGE_TYPE=mysql
+#       - MYSQL_USER=zipkin
+#       - MYSQL_PASS=zipkin
+#       - MYSQL_HOST=ecom-zipkin-storage
+#       - MYSQL_JDBC_URL=jdbc:mysql://ecom-zipkin-storage:3306/zipkin?passwordCharacterEncoding=UTF-8&useGssapiServerConnection=false
+#     ports:
+#       - 3192:9411
+#     depends_on:
+#       - ecom-zipkin-storage
+#  # ELK configuration
+#   elasticsearch:
+#     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+#     environment:
+#       - discovery.type=single-node
+#       - ES_JAVA_OPTS=-Xms512m -Xmx512m
+#       - ELASTIC_USERNAME=elastic
+#       - ELASTIC_PASSWORD=Aj189628@
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.10.2
-    ports:
-      - 3194:5601
-    links:
-      - "elasticsearch"
+#   kibana:
+#     image: docker.elastic.co/kibana/kibana:8.10.2
+#     ports:
+#       - 3194:5601
+#     links:
+#       - "elasticsearch"
 
 # All Services Configuration
   ecom-service-registry:
@@ -152,9 +152,11 @@ services:
       dockerfile: './Dockerfile'
     environment:
       DATABASE_URL: postgres://janny:Aj189628@@ecom-master-db-service:5432/ecom-catalog-service
+      MONGODB_URI: mongodb://ecom-mongo-db:27017/ecom-catalog-service
       PORT: 3130
       JWT_SECRET: Aj189628@
       PASS_SECRET: Aj189628@
+      RABBIT_MQ_URL: amqp://admin:admin@192.168.30.28:3156
     depends_on:
       - ecom-master-db-service
       - ecom-api-gateway

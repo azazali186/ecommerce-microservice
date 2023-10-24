@@ -6,6 +6,8 @@ import Stocks from "../../models/stocks.mjs";
 import Category from "../../models/category.mjs";
 import { paginate } from "../../utils/index.mjs";
 import { sendProductForES } from "../../rabbitMq/sendProductForES.mjs";
+import Translation from "../../models/translation.mjs";
+import ProductMetaData from "../../models/productMetaData.mjs";
 const productsRoutes = express.Router();
 
 // Update Product
@@ -110,12 +112,29 @@ productsRoutes.post("/", verifyTokenAndAuthorization, async (req, res) => {
     try {
       const product = new Product(req.body);
       if (req.body.stocks) {
-        const stocks = await Stocks.insertMany(req.body.stocks);
+        req.body.stocks.map((s) => {
+          s.productId = product._id;
+          return s
+        })
+        const stocks = await Stocks.insertMany();
         product.stock = stocks.map((stock) => stock._id);
       }
-      if (req.body.categories) {
-        const categories = await Category.insertMany(req.body.categories);
-        product.categories = categories.map((category) => category._id);
+      if (req.body.translations) {
+
+        const translations = await Translation.insertMany(req.body.translations);
+        product.translation = translations.map((translations) => translations._id);
+      }
+      if (req.body.category) {
+        const category = await Category.insertMany(req.body.category);
+        product.categories = category.map((cat) => cat._id);
+      }
+      if (req.body.metas) {
+        req.body.metas.map((m) => {
+          m.productId = product._id;
+          return m
+        })
+        const metas = await ProductMetaData.insertMany(req.body.metas);
+        product.meta = metas.map((meta) => meta._id);
       }
       await product.save();
 

@@ -36,6 +36,6 @@ productMetaDataSchema.pre("save", function (next) {
   next();
 });
 
-const ProductPrices = mongoose.model("productMetaData", productMetaDataSchema);
+const ProductMetaData = mongoose.model("productMetaData", productMetaDataSchema);
 
-export default ProductPrices;
+export default ProductMetaData;
