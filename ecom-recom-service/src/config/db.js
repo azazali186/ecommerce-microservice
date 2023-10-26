@@ -1,12 +1,11 @@
 import mongoose from "mongoose";
 
 const url = process.env.TENSORFLOW_DB_URL || "mongodb://192.168.30.28:3153";
-const dbName = process.env.TENSORFLOW_DB_NAME || "tensorflow-training";
 export let db;
 
 export const mongoConnect = () => {
   mongoose
-    .connect(url + "/" + dbName, {
+    .connect(url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })

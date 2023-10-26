@@ -20,8 +20,6 @@ export const verifyTokenAndAuthorization = (req, res, next) => {
   verifyToken(req, res, async () => {
     let granted = false;
 
-    console.log("User is ", req.user)
-
     if(req.user.role != 'admin' || req.user.id != req.params.id ){
       let role = await Role.findOne({
         name: req.user?.role
