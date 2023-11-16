@@ -64,6 +64,7 @@ export const inserData = async (expressListRoutes, app) => {
 
 export const createEs = async (name, body) => {
   try {
+    console.log("body is ", body);
     await esClient.index({
       index: name,
       body: body,
@@ -117,10 +118,8 @@ export const createProductData = async (
   }).save();
 
   await createIntraction(product.id, userId, intraction);
-  await createEs("products", product);
-  // Train/update your TensorFlow model
+  await createEs("products", product.dataValues);
   try {
-    // Hypothetical function to update your recommendation model with new data
     await trainTensorFlowModel();
   } catch (err) {
     console.log("err", err);

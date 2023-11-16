@@ -26,14 +26,13 @@ const saveEmbeddingsToMongo = async (embeddings, collectionName) => {
   await collection.insertOne({ data: embeddingsArray });
 };
 
-
 export const getIntractionValue = (intraction) => {
   return WEIGHTS[intraction] || 0;
 };
 
 const createUserItemMatrix = async (userId) => {
   const intractions = await Intraction.findAll();
-  const users = await User.findOne({ where: { userId: userId } });
+  const users = await User.findAll({ where: { userId: userId } });
   const products = await Product.findAll();
 
   // Initialize a matrix with zeros
@@ -48,7 +47,11 @@ const createUserItemMatrix = async (userId) => {
     );
     const weight = getIntractionValue[intraction.type];
 
-    matrix[userIndex][productIndex] += weight;
+    if (!isNaN(weight) && userIndex !== -1 && productIndex !== -1) {
+      matrix[userIndex][productIndex] += weight;
+    } else {
+      // console.error("Invalid interaction:", intraction);
+    }
   });
 
   return matrix;
@@ -156,9 +159,11 @@ export const trainTensorFlowModel = async () => {
 
   const optimizer = tf.train.sgd(0.1);
   for (let epoch = 0; epoch < 1000; epoch++) {
-
     optimizer.minimize(() => {
-      const predictedInteraction = tf.dot(userEmbeddings, productEmbeddings.transpose());
+      const predictedInteraction = tf.dot(
+        userEmbeddings,
+        productEmbeddings.transpose()
+      );
 
       const loss = tf.losses.meanSquaredError(
         intractionMatrix,

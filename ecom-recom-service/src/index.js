@@ -59,7 +59,7 @@ app.use(cors(corsOptions)); */
 import productsRoutes from './routes/products/index.mjs'
 import { mongoConnect } from './config/db.js';
 
-app.use("/api/recommendation-service/products", productsRoutes);
+app.use("/api/recom-service/products", productsRoutes);
 await inserData(expressListRoutes, app);
 
 rabbitMQListener();

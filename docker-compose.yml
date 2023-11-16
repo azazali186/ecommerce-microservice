@@ -1,20 +1,20 @@
-version: '3'
+version: "3"
 
 services:
-# Databases configurations
+  # Databases configurations
 
   ecom-rabbitmq-db:
     image: rabbitmq:management
     container_name: ecom-rabbitmq-container
     ports:
       - "31567:15672" # Management UI
-      - "3156:5672"   # Default RabbitMQ port
+      - "3156:5672" # Default RabbitMQ port
     environment:
       RABBITMQ_DEFAULT_USER: "admin"
       RABBITMQ_DEFAULT_PASS: "admin"
     volumes:
       - ecom-microservice-rabbitmq-data:/var/lib/rabbitmq
-  
+
   ecom-mongo-db:
     image: mongo:latest
     container_name: ecom-mongo-container
@@ -40,23 +40,25 @@ services:
     volumes:
       - ecommerce-microservice_timescale_data:/var/lib/postgresql/data
 
-# Prometheus configuration
+  # Prometheus configuration
   prometheus:
     image: prom/prometheus
     container_name: ecom-prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+      - "--config.file=/etc/prometheus/prometheus.yml"
     ports:
       - 3198:9090
+    
   grafana:
     image: grafana/grafana
     container_name: ecom-grafana
     ports:
       - 3197:3000
-# Zipkin configuration
-  
+    
+  # Zipkin configuration
+
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin-playground-zipkin
@@ -68,60 +70,69 @@ services:
       - MYSQL_JDBC_URL=jdbc:mysql://ecom-zipkin-storage:3306/zipkin?passwordCharacterEncoding=UTF-8&useGssapiServerConnection=false
     ports:
       - 3192:9411
+    
     depends_on:
       - ecom-zipkin-storage
- # ELK configuration
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
-    environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms512m
-      - ELASTIC_USERNAME=elastic
-      - ELASTIC_PASSWORD=Aj189628@
-    ports: 
-      - 9200:9200
+  # ELK configuration
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+  #   environment:
+  #     - discovery.type=single-node
+  #     - ELASTIC_USERNAME=your_elastic_username
+  #     - ELASTIC_PASSWORD=your_elastic_password
+  #     - xpack.security.enabled=true
+  #     - xpack.security.transport.ssl.enabled=true
+  #     - xpack.security.http.ssl.enabled=true
+  #   ports:
+  #     - 9200:9200
+    
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.10.2
-    ports:
-      - 3194:5601
-    links:
-      - "elasticsearch"
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.11.1
+  #   environment:
+  #     - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
+  #     - ELASTICSEARCH_USERNAME=your_elastic_username
+  #     - ELASTICSEARCH_PASSWORD=your_elastic_password
+  #   ports:
+  #     - 3601:5601
 
-# All Services Configuration
+  # All Services Configuration
   ecom-service-registry:
     build:
       context: ./ecom-service-registry
-      dockerfile: './Dockerfile'
+      dockerfile: "./Dockerfile"
     ports:
       - "3145:3145"
+    
     volumes:
       - ecom-service-registry-volume:/app
 
   ecom-config-server:
     build:
       context: ./ecom-config-server
-      dockerfile: './Dockerfile'
+      dockerfile: "./Dockerfile"
     ports:
       - 3088:3088
+    
     volumes:
       - ecom-config-server-volume:/app
 
   ecom-api-gateway:
     build:
-      context: './ecom-api-gateway'
-      dockerfile: './Dockerfile'
+      context: "./ecom-api-gateway"
+      dockerfile: "./Dockerfile"
     ports:
       - "3099:3099"
-    depends_on: 
+    depends_on:
       - ecom-config-server
+    
     volumes:
       - ecom-api-gateway-volume:/app
 
   ecom-auth-service:
     build:
       context: ./ecom-auth-service
-      dockerfile: './Dockerfile'
+      dockerfile: "./Dockerfile"
     environment:
       DATABASE_URL: postgres://janny:Aj189628@@ecom-master-db-service:5432/ecom-auth-service
       PORT: 3100
@@ -130,28 +141,30 @@ services:
     depends_on:
       - ecom-master-db-service
       - ecom-api-gateway
+    
     volumes:
       - ecom-auth-service-volume:/path/in/container
 
   ecom-master-service:
     build:
       context: ./ecom-master-service
-      dockerfile: './Dockerfile'
+      dockerfile: "./Dockerfile"
     environment:
       DATABASE_URL: postgres://janny:Aj189628@@ecom-master-db-service:5432/ecom-master-service
       PORT: 3110
       JWT_SECRET: Aj189628@
       PASS_SECRET: Aj189628@
+    
     depends_on:
       - ecom-master-db-service
       - ecom-api-gateway
     volumes:
       - ecom-master-service-volume:/path/in/container
-  
+
   ecom-catalogue-service:
     build:
       context: ./ecom-catalogue-service
-      dockerfile: './Dockerfile'
+      dockerfile: "./Dockerfile"
     environment:
       DATABASE_URL: postgres://janny:Aj189628@@ecom-master-db-service:5432/ecom-catalog-service
       MONGODB_URI: mongodb://ecom-mongo-db:27017/ecom-catalog-service
@@ -159,6 +172,7 @@ services:
       JWT_SECRET: Aj189628@
       PASS_SECRET: Aj189628@
       RABBIT_MQ_URL: amqp://admin:admin@192.168.30.28:3156
+    
     depends_on:
       - ecom-master-db-service
       - ecom-api-gateway
@@ -168,7 +182,7 @@ services:
   ecom-file-service:
     build:
       context: ./ecom-file-service
-      dockerfile: './Dockerfile'
+      dockerfile: "./Dockerfile"
     environment:
       MONGODB_URI: mongodb://ecom-mongo-db:27017/ecom-file-service
       PORT: 3055
@@ -176,6 +190,7 @@ services:
       PASS_SECRET: Aj189628@
     ports:
       - "3055:3055"
+    
     depends_on:
       - ecom-mongo-db
       - ecom-api-gateway
@@ -185,7 +200,7 @@ services:
   ecom-profile-service:
     build:
       context: ./ecom-profile-service
-      dockerfile: './Dockerfile'
+      dockerfile: "./Dockerfile"
     environment:
       MONGODB_URI: mongodb://ecom-mongo-db:27017/ecom-profile-service
       PORT: 3120
@@ -194,28 +209,30 @@ services:
     depends_on:
       - ecom-mongo-db
       - ecom-api-gateway
+    
     volumes:
       - ecom-profile-service-volume:/path/in/container
 
   ecom-recom-service:
     build:
       context: ./ecom-recom-service
-      dockerfile: './Dockerfile'
+      dockerfile: "./Dockerfile"
     environment:
       TENSORFLOW_DB_URL: mongodb://ecom-mongo-db:27017/ecom-recom-db
       DATABASE_URL: postgres://janny:Aj189628@@ecom-master-db-service:5432/ecom-recom-service
-      ES_CLIENT_URL: http://elasticsearch:9200
+      ES_CLIENT_URL: http://192.168.30.28:9200
       PORT: 3199
       JWT_SECRET: Aj189628@
       PASS_SECRET: Aj189628@
       TENSORFLOW_DB_NAME: ecom-recom-db
+    
     depends_on:
       - ecom-mongo-db
       - ecom-api-gateway
     volumes:
       - ecom-recom-service-volume:/path/in/container
 
-volumes: 
+volumes:
   ecommerce-microservice_timescale_data:
     external: true
   mongodata:
@@ -229,3 +246,4 @@ volumes:
   ecom-recom-service-volume:
   ecom-catalogue-service-volume:
   ecom-microservice-rabbitmq-data:
+
