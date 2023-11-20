@@ -1,7 +1,7 @@
 import Permissions from "../models/permissions.mjs";
 import { Op } from "sequelize";
 
-import { esClient } from "../config/esClient.mjs";
+import { esClient } from "../config/esClient.js";
 import Product from "../models/product.mjs";
 import Intraction from "../models/intraction.mjs";
 import {

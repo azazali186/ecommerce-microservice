@@ -221,7 +221,7 @@ services:
     environment:
       TENSORFLOW_DB_URL: mongodb://ecom-mongo-db:27017/ecom-recom-db
       DATABASE_URL: postgres://janny:Aj189628@@ecom-master-db-service:5432/ecom-recom-service
-      ES_CLIENT_URL: http://192.168.30.28:9200
+      ES_CLIENT_URL: https://192.168.30.28:9200
       PORT: 3199
       JWT_SECRET: Aj189628@
       PASS_SECRET: Aj189628@

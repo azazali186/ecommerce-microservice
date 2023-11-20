@@ -3,11 +3,18 @@ import { HttpConnection } from "@elastic/transport";
 import http from "http";
 import fs from 'fs';
 import path from "path";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 
 
 const agent = new http.Agent({ keepAlive: true });
 
-const certificatePath = path.join(__dirname, 'src', 'config', 'http_ca.crt');
+// Construct the dynamic path to the certificate file
+const certificatePath = path.join(__dirname, 'http_ca.crt');
 
 export const esClient = new Client({
   node: process.env.ES_CLIENT_URL || "https://127.0.0.1:9200",
