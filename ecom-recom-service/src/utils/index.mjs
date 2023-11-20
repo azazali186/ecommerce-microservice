@@ -134,30 +134,19 @@ async function createIntraction(productId, userId, intraction) {
     productId: productId,
     userId: userId,
     type: intraction,
-    rating: getIntractionValue(intraction),
+    rating: await getIntractionValue(intraction),
   }).save();
 }
 
 export const createProductData = async (
-  productId,
-  name,
-  description,
+  product,
   intraction,
   userId
 ) => {
-  await new User({
-    userId: userId,
-    username: userId,
-  }).save();
-
-  const product = await new Product({
-    name: name,
-    productId: productId,
-    description: description,
-  }).save();
+  
 
   await createIntraction(product.id, userId, intraction);
-  await createEs("products", product.dataValues);
+  await createEs("products", product);
   try {
     await trainTensorFlowModel();
   } catch (err) {

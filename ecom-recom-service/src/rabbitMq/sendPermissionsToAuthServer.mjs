@@ -5,7 +5,7 @@ export const sendPermissionsToAuthServer = async () => {
 
   const permissions = await Permission.findAll();
 
-  const connection = await amqp.connect(process.env.RABBIT_MQ_URL || "amqp://localhost");
+  const connection = await amqp.connect(process.env.RABBIT_MQ_URL || "amqp://admin:admin@192.168.30.28:3156");
   const channel = await connection.createChannel();
 
   const exchange = "ecommerce_permissions_exchange";

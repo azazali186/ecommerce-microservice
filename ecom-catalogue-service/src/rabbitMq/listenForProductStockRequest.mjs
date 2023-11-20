@@ -22,7 +22,7 @@ const productQuantitySync = async (data) => {
 };
 
 export const listenForProductStockRequest = async () => {
-  const connection = await amqp.connect(
+  const connection = await connect(
     process.env.RABBIT_MQ_URL || "amqp://localhost"
   );
   const channel = await connection.createChannel();

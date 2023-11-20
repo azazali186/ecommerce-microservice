@@ -9,19 +9,35 @@ import {
 import tf from "@tensorflow/tfjs-node";
 import { requestProducts } from "../../rabbitMq/requestProducts.mjs";
 import { createProductData, updateEs } from "../../utils/index.mjs";
+import User from "../../models/user.mjs";
 
 // Create a new product in PostgreSQL and index it in Elasticsearch
 productsRoutes.post("/products", async (req, res) => {
   const { productId, name, description, intraction, userId } = req.body;
   // Save product to PostgreSQL & Elasticsearch
-  const product = createProductData(
-    productId,
-    name,
-    description,
-    intraction,
-    userId
-  );
-  res.json(product);
+
+  let user = await User.findOne({ where: { userId: userId } });
+
+  let product = await Product.findOne({ where: { productId } });
+
+  if (!user) {
+    user = await new User({
+      userId: userId,
+      username: userId,
+    }).save();
+  }
+
+  if (!product) {
+    product = await new Product({
+      name: name,
+      productId: productId,
+      description: description,
+    }).save();
+  }
+
+  const products = await createProductData(product, intraction, userId);
+
+  res.json(products);
 });
 
 // Update product details in PostgreSQL and Elasticsearch
@@ -47,7 +63,6 @@ productsRoutes.patch("/products/:id", async (req, res) => {
   // Update product in Elasticsearch
 
   await updateEs(pId, "products", updatedProduct);
-
 
   // Re-train/update your TensorFlow model (hypothetical function)
   try {
@@ -124,7 +139,7 @@ productsRoutes.get("/recommended/:userId", async (req, res) => {
 
   const recommendedProducts = await getRecommandedProducts(userId, 15);
 
-  return res.json({ recommendations: recommendedProducts });
+  return res.json({ recommendations: JSON.parse(recommendedProducts) });
 });
 
 export default productsRoutes;

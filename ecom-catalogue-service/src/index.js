@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
+import { rabbitMQListener } from './rabbitMq/index.mjs'
 import expressListRoutes from 'express-list-routes';
 
 import { zipkinMiddleware } from './config/zipkin.mjs';
@@ -63,6 +64,8 @@ app.use("/api/catalogue-service/stocks", stocksRoutes);
 app.use("/api/catalogue-service/categories", categoriesRoutes);
 
 inserData(expressListRoutes, app);
+
+rabbitMQListener();
 
 app.listen(process.env.PORT || 3130, function () {
   console.log(

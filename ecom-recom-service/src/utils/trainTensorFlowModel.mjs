@@ -26,8 +26,8 @@ const saveEmbeddingsToMongo = async (embeddings, collectionName) => {
   await collection.insertOne({ data: embeddingsArray });
 };
 
-export const getIntractionValue = (intraction) => {
-  return WEIGHTS[intraction] || 0;
+export const getIntractionValue = async (intraction) => {
+  return (await WEIGHTS[intraction]) || 0;
 };
 
 const createUserItemMatrix = async (userId) => {
@@ -40,12 +40,14 @@ const createUserItemMatrix = async (userId) => {
     .fill(null)
     .map(() => Array(products.length).fill(0));
 
-  intractions.forEach((intraction) => {
+  intractions.forEach(async (intraction) => {
     const userIndex = users.findIndex((u) => u.userId === intraction.userId);
     const productIndex = products.findIndex(
       (p) => p.id === intraction.productId
     );
-    const weight = getIntractionValue[intraction.type];
+    // console.log("User Index:", userIndex, "Product Index:", productIndex);
+
+    const weight = await getIntractionValue(intraction.type);
 
     if (!isNaN(weight) && userIndex !== -1 && productIndex !== -1) {
       matrix[userIndex][productIndex] += weight;
@@ -57,22 +59,51 @@ const createUserItemMatrix = async (userId) => {
   return matrix;
 };
 
-const trainRecommendationModel = async (matrix) => {
-  const tensor = tf.tensor(matrix);
-  const userEmbeddings = tf.variable(tf.randomNormal([matrix.length, 50]));
-  const productEmbeddings = tf.variable(
-    tf.randomNormal([50, matrix[0].length])
-  );
-  const optimizer = tf.train.sgd(0.1);
+const trainRecommendationModel = async (
+  matrix,
+  embeddingSize = 50,
+  learningRate = 0.01,
+  epochs = 1000
+) => {
+  // Input validation
+  if (!matrix || matrix.length === 0 || matrix[0].length === 0) {
+    throw new Error("Invalid matrix");
+  }
 
-  for (let epoch = 0; epoch < 1000; epoch++) {
+  // Create a TensorFlow tensor from the input matrix
+  const tensor = tf.tensor(matrix);
+  console.log("Matrix Dimensions:", tensor.shape);
+
+  // Initialize user and product embeddings with random normal distributions
+  const userEmbeddings = tf.variable(
+    tf.randomNormal([matrix.length, embeddingSize])
+  );
+  const productEmbeddings = tf.variable(
+    tf.randomNormal([embeddingSize, matrix[0].length])
+  );
+
+  // Configure the optimizer with the specified learning rate
+  const optimizer = tf.train.sgd(learningRate);
+
+  // Training loop
+  for (let epoch = 0; epoch < epochs; epoch++) {
     optimizer.minimize(() => {
+      // Predictions based on user and product embeddings
       const predicted = tf.matMul(userEmbeddings, productEmbeddings);
+
+      // Calculate mean squared error loss
       const loss = tf.losses.meanSquaredError(tensor, predicted);
+
+      // Log the training progress
+      // console.log("Epoch:", epoch, "Loss:", loss.dataSync()[0]);
+
       return loss;
     });
   }
 
+  console.log("Training complete.");
+
+  // Return the trained user and product embeddings
   return { userEmbeddings, productEmbeddings };
 };
 
@@ -81,6 +112,10 @@ const getRecommendationsForUser = (
   productEmbeddings,
   topN = 10
 ) => {
+  if (!userEmbedding || !productEmbeddings) {
+    throw new Error("User or product embeddings are null");
+  }
+
   const predictions = tf.matMul(userEmbedding, productEmbeddings);
   const values = predictions.dataSync();
 
@@ -92,29 +127,34 @@ const getRecommendationsForUser = (
 };
 
 export const getRecommandedProducts = async (userId = null, topN = 10) => {
-  const matrix = createUserItemMatrix(userId);
-  const { userEmbeddings, productEmbeddings } =
-    trainRecommendationModel(matrix);
-  const productIds = getRecommendationsForUser(
+  const matrix = await createUserItemMatrix(userId);
+  const { userEmbeddings, productEmbeddings } = await trainRecommendationModel(
+    matrix
+  );
+  // const recommendations = getRecommendationsForUser(userEmbeddings, productEmbeddings);
+  const productIndexIds = getRecommendationsForUser(
     userEmbeddings,
     productEmbeddings,
     topN
   );
 
-  const sequelizeResult = await Product.findAll({
-    where: {
-      productId: {
-        [Op.in]: productIds,
-      },
-    },
-    attributes: ["productId"],
+  const productsData = await Product.findAll();
+
+  const productIds = [];
+
+  productIndexIds.forEach((p) => {
+    const product = productsData[p];
+    productIds.push(product.productId);
   });
 
-  const results = sequelizeResult.map((product) => product.productId);
-  if (results) {
-    const products = requestProducts({
-      productIds: results,
+  console.log("productIndexIds  ", productIndexIds);
+
+  if (productIds) {
+    console.log("requestProducts started  ");
+    const products = await requestProducts({
+      productIds: productIds,
     });
+    console.log("requestProducts ended  ");
     return products;
   }
   return results;

@@ -7,7 +7,7 @@ const getProductData = async (productData) => {
     return [];
   }
   const products = await Product.find({ _id: { $in: productIds } })
-    .populate("stocks") // Assuming a 'stocks' field references the Stock model
+    .populate("stock") // Assuming a 'stocks' field references the Stock model
     .populate("category");
 
   const filteredProducts = products.filter(

@@ -226,12 +226,14 @@ services:
       JWT_SECRET: Aj189628@
       PASS_SECRET: Aj189628@
       TENSORFLOW_DB_NAME: ecom-recom-db
+      RABBIT_MQ_URL: "amqp://admin:admin@192.168.30.28:3156"
+
     
-  #   depends_on:
-  #     - ecom-mongo-db
-  #     - ecom-api-gateway
-  #   volumes:
-  #     - ecom-recom-service-volume:/path/in/container
+    # depends_on:
+    #   - ecom-mongo-db
+    #   - ecom-api-gateway
+    # volumes:
+    #   - ecom-recom-service-volume:/path/in/container
 
 volumes:
   ecommerce-microservice_timescale_data:
