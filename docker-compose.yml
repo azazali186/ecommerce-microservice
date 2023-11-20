@@ -124,6 +124,7 @@ services:
     ports:
       - "3099:3099"
     depends_on:
+      - ecom-service-registry
       - ecom-config-server
     
     volumes:
@@ -226,11 +227,11 @@ services:
       PASS_SECRET: Aj189628@
       TENSORFLOW_DB_NAME: ecom-recom-db
     
-    depends_on:
-      - ecom-mongo-db
-      - ecom-api-gateway
-    volumes:
-      - ecom-recom-service-volume:/path/in/container
+  #   depends_on:
+  #     - ecom-mongo-db
+  #     - ecom-api-gateway
+  #   volumes:
+  #     - ecom-recom-service-volume:/path/in/container
 
 volumes:
   ecommerce-microservice_timescale_data:

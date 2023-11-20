@@ -1,7 +1,7 @@
 import Permissions from "../models/permissions.mjs";
 import { Op } from "sequelize";
 
-import { esClient } from "../config/esClient.js";
+import { esClient } from "../config/esClient.mjs";
 import Product from "../models/product.mjs";
 import Intraction from "../models/intraction.mjs";
 import {
@@ -65,9 +65,18 @@ export const inserData = async (expressListRoutes, app) => {
 export const createEs = async (name, body) => {
   try {
     console.log("body is ", body);
+    const bodyData = {
+      settings: {
+        number_of_shards: 1,
+        number_of_replicas: 0,
+      },
+      mappings: {
+        properties: body,
+      },
+    };
     await esClient.index({
       index: name,
-      body: body,
+      body: bodyData,
     });
   } catch (err) {
     console.log("err", err);
@@ -77,13 +86,43 @@ export const createEs = async (name, body) => {
 
 export const updateEs = async (id, name, body) => {
   try {
-    esClient.update({
+    // Close the index before making changes
+    // Search for the product by ID
+    const { body: searchResult } = await esClient.search({
+      index: name,
+      body: {
+        query: {
+          match: { id: id },
+        },
+      },
+    });
+
+    // Check if a matching document is found
+    if (searchResult.hits.total.value > 0) {
+      const document = searchResult.hits.hits[0]._source;
+
+      // Update the document with the provided changes
+      const { body: updateResult } = await esClient.update({
+        index: name,
+        id: id,
+        body: {
+          doc: body,
+        },
+      });
+      console.log(
+        `Product with ID '${id}' updated successfully.`,
+        updateResult
+      );
+    } else {
+      console.log(`No product found with ID '${id}'.`);
+    }
+    /* esClient.update({
       index: name,
       id: id,
       body: {
         doc: body,
       },
-    });
+    }); */
   } catch (err) {
     console.log("err", err);
     return { error: "Error updating product in Elasticsearch." };
